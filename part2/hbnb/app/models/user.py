@@ -20,6 +20,8 @@ class User(BaseModel):
     @first_name.setter
     def first_name(self, value):
         """setter for first_name (protected property to check lenght)"""
+        if not isinstance(value, str):
+            raise TypeError("First name should be a string")
         if len(value) >= 50:
             raise ValueError("First name cannot be longer than 50 characters")
         self._first_name = value
@@ -32,6 +34,8 @@ class User(BaseModel):
     @last_name.setter
     def last_name(self, value):
         """setter for last_name (protected property to check lenght)"""
+        if not isinstance(value, str):
+            raise TypeError("Last name should be a string")
         if len(value) >= 50:
             raise ValueError("Last name cannot be longer than 50 characters")
         self._last_name = value
@@ -44,6 +48,8 @@ class User(BaseModel):
     @email.setter
     def email(self, value):
         """setter for email (private property)"""
+        if not isinstance(value, str):
+            raise TypeError("The email should be a string")
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if re.match(pattern, value):
             self.__email = value
@@ -58,11 +64,13 @@ class User(BaseModel):
     @password.setter
     def password(self, value):
         """setter for password (private property)"""
+        if not isinstance(value, str):
+            raise TypeError("The password should be a string")
         pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
         if re.match(pattern, value):
             self.__password = value
         else:
-            raise ValueError("The password should be at least 8 charcaters long, and contain at least one upper, and one lowercase, and one digit.")
+            raise ValueError("The password should be at least 8 characters long, and contain at least one upper, and one lowercase, and one digit.")
     
     @property
     def is_admin(self):
