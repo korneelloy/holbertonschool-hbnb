@@ -2,5 +2,5 @@
 venv/
 env/
 myenv/
-**/__pycache__
+**/__pycache__/
 *.egg_info
