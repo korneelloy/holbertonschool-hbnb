@@ -1,6 +1,5 @@
 from app.models.basemodel import BaseModel
 from app.services import facade
-print(dir(facade))
 
 
 class Place(BaseModel):
@@ -46,8 +45,8 @@ class Place(BaseModel):
     @price.setter
     def price(self, value):
         """setter for price (private property)"""
-        if not isinstance(value, int):
-            raise TypeError("The price should be an integer")
+        if not isinstance(value, float):
+            raise TypeError("The price should be an float")
         if value >= 0:
             self.__price = value
         else:
@@ -61,8 +60,8 @@ class Place(BaseModel):
     @latitude.setter
     def latitude(self, value):
         """setter for latitude (private property)"""
-        if not isinstance(value, int):
-            raise TypeError("The latitude should be an integer")
+        if not isinstance(value, float):
+            raise TypeError("The latitude should be a float")
         if value >= -90 and value <= 90:
             self.__latitude = value
         else:
@@ -76,8 +75,8 @@ class Place(BaseModel):
     @longitude.setter
     def longitude(self, value):
         """setter for longitude (private property)"""
-        if not isinstance(value, str):
-            raise TypeError("The longitude should be an integer")
+        if not isinstance(value, float):
+            raise TypeError("The longitude should be a float")
         if value >= -180 and value <= 180:
             self.__longitude = value
         else:

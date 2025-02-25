@@ -15,8 +15,7 @@ class Review(BaseModel):
 
     @rating.setter
     def rating(self, value):
-        pattern = r'^[1-5]$'
-        if re.match(pattern, value):
+        if 1 <= value <= 5:
             self._rating = value
         else:
             raise ValueError('Rating must be an integer between 1 and 5')
@@ -27,7 +26,7 @@ class Review(BaseModel):
 
     @comment.setter
     def comment(self, value):
-        pattern = r'^[a-zA-Z0-9]+$'
+        pattern = r'^[a-zA-Z0-9!.,?: ]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._comment = value
         else:
@@ -39,10 +38,11 @@ class Review(BaseModel):
 
     @place.setter
     def place(self, value):
-        if isinstance(value, str):
+        from app.models.place import Place
+        if isinstance(value, Place):
             self.__place = value
         else:
-            raise TypeError('Value must be a string')
+            raise TypeError('Place must be a tupple of type place')
 
     @property
     def user(self):
@@ -50,7 +50,8 @@ class Review(BaseModel):
 
     @user.setter
     def user(self, value):
-        if isinstance(value, str):
+        from app.models.user import User
+        if isinstance(value, User):
             self.__user = value
         else:
-            raise TypeError('Value must be a string')
+            raise TypeError('User must be a tupple of type user')
