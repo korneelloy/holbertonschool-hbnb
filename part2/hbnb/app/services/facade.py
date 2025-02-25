@@ -18,7 +18,7 @@ class HBnBFacade:
 
     def get_user(self, user_id):
         return self.user_repo.get(user_id)
-    
+
     def get_all_users(self):
         users = self.user_repo.get_all()
         user_list = [user.to_dict() for user in users]
@@ -26,6 +26,11 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+    
+    def update_user(self, user_id, user_data):
+        updated_user = self.user_repo.update(user_id, user_data)
+        return(updated_user)
+
 
     # Placeholder method for fetching a place by ID
     def create_place(self, place_data):

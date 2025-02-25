@@ -49,3 +49,16 @@ class UserResource(Resource):
         if not user:
             return {'error': 'User not found'}, 404
         return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
+
+
+    @api.response(200, 'User details retrieved successfully')
+    @api.response(404, 'User not found')
+    def put(self, user_id):
+        """change existing user"""
+        user_data = api.payload
+        # Simulate email uniqueness check (to be replaced by real validation with persistence)
+        existing_user = facade.get_user(user_id)
+        if not existing_user:
+            return {'error': 'User not found'}, 404
+        updated_user = facade.update_user(user_id, user_data)
+        return(updated_user)
