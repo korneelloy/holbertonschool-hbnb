@@ -6,7 +6,7 @@ def test_user_creation():
     assert user.first_name == "John"
     assert user.last_name == "Doe"
     assert user.email == "john.doe@example.com"
-    assert user.password == "chaussette"
+    assert user.password == "Chaussette1"
     assert user.is_admin is False  # Default value
     print("User creation test passed!")
 
