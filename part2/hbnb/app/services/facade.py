@@ -26,14 +26,19 @@ class HBnBFacade:
     def create_place(self, place_data):
         place = Place(**place_data)
         self.place_repo.add(place)
+        return place
 
     def update_place(self, place_id, place_data):
         # Placeholder for logic to update a place
         pass
 
     def get_place(self, place_id):
-        """Get the place_id"""
+        """Get the place"""
         return self.place_repo.get(place_id)
+
+    def get_place_id(self):
+        """Get the place_id"""
+        return self.place_repo.get()
 
     def get_all_places(self):
         # Placeholder for logic to retrieve all places
@@ -42,6 +47,7 @@ class HBnBFacade:
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
         self.amenity_repo.add(amenity)
+        return amenity
 
     def update_amenity(self, amenity_id, amenity_data):
         # Placeholder for logic to update an amenity
