@@ -12,6 +12,9 @@ class User(BaseModel):
         self.places = []
         self.reviews = []
 
+    def to_dict(self):
+        return {'user_id': self.id, 'first_name': self.first_name, 'last_name': self.last_name, 'email': self.email}
+
     @property
     def first_name(self):
         """getter for first_name (protected property)"""

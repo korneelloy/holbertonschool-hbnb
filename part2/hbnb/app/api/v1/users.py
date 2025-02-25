@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+import json
 
 api = Namespace('users', description='User operations')
 
@@ -28,6 +29,15 @@ class UserList(Resource):
 
         new_user = facade.create_user(user_data)
         return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
+    
+    @api.response(200, 'Users details retrieved successfully')
+    @api.response(404, 'Users not found')
+    def get(self):
+        """Get users"""
+        users = facade.get_all_users()
+        if not users:   
+            return {'error': 'Users not found'}, 404
+        return users
 
 @api.route('/<user_id>')
 class UserResource(Resource):
