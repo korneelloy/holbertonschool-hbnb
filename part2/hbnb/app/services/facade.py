@@ -47,10 +47,6 @@ class HBnBFacade:
         """Get the place"""
         return self.place_repo.get(place_id)
 
-    def get_place_id(self):
-        """Get the place_id"""
-        return self.place_repo.get()
-
     def get_all_places(self):
         places = self.place_repo.get_all()
         place_list = [place.to_dict() for place in places]
