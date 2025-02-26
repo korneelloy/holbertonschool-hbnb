@@ -25,8 +25,8 @@ class User(BaseModel):
         """setter for first_name (protected property to check lenght)"""
         if not isinstance(value, str):
             raise TypeError("First name should be a string")
-        if len(value) >= 50:
-            raise ValueError("First name cannot be longer than 50 characters")
+        if len(value) >= 50 or len(value) < 2:
+            raise ValueError("First name cannot be longer than 50 characters or shorter than 2 characters")
         self._first_name = value
 
     @property
@@ -39,8 +39,8 @@ class User(BaseModel):
         """setter for last_name (protected property to check lenght)"""
         if not isinstance(value, str):
             raise TypeError("Last name should be a string")
-        if len(value) >= 50:
-            raise ValueError("Last name cannot be longer than 50 characters")
+        if len(value) >= 50 or len(value) < 2:
+            raise ValueError("Last name cannot be longer than 50 characters or shorter than 2 characters")
         self._last_name = value
 
     @property

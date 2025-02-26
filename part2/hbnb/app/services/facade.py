@@ -28,8 +28,8 @@ class HBnBFacade:
         return self.user_repo.get_by_attribute('email', email)
     
     def update_user(self, user_id, user_data):
-        updated_user = self.user_repo.update(user_id, user_data)
-        return(updated_user)
+        self.user_repo.update(user_id, user_data)
+        return self.user_repo.get(user_id)
 
 
     # Placeholder method for fetching a place by ID
