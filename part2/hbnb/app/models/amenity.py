@@ -12,6 +12,9 @@ class Amenity(BaseModel):
         """Add a place to Amenity (Many-to-many relationship)"""
         self.places.append(place)
 
+    def to_dict(self):
+        return {'amenity_id': self.id, 'name': self.name, 'description': self.description, 'places': self.places}
+
     @property
     def name(self):
         """getter for name (protected property)"""

@@ -22,6 +22,10 @@ class Place(BaseModel):
         """Add an amenity to the place."""
         self.amenities.append(amenity)
 
+    def to_dict(self):
+        return {'title': self.title, 'description': self.description, 'price': self.price, 'latitude': self.latitude, 
+                'longitude': self.longitude, 'owner': self.owner, 'reviews': self.reviews, 'amenities': self.amenities}
+
 
     @property
     def title(self):
