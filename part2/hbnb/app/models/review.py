@@ -34,24 +34,28 @@ class Review(BaseModel):
 
     @property
     def place(self):
-        return self.__place
+        return self.place
 
     @place.setter
     def place(self, value):
         from app.models.place import Place
         if isinstance(value, Place):
-            self.__place = value
+            self.place = value.id
+        elif isinstance(value, str):
+            self.place = value
         else:
             raise TypeError('Place must be a tupple of type place')
 
     @property
     def user(self):
-        return self.__user
+        return self.user
 
     @user.setter
     def user(self, value):
         from app.models.user import User
         if isinstance(value, User):
-            self.__user = value
+            self.user = value.id
+        elif isinstance(value, str):
+            self.user = value            
         else:
             raise TypeError('User must be a tupple of type user')

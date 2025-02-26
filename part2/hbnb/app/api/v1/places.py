@@ -42,8 +42,8 @@ class PlaceList(Resource):
         except:
             return "Invalid Input Data", 400
         return {'id': new_place.id, 'title': new_place.title, 'description': new_place.description, 'price': new_place.price, 
-                'latitude': new_place.latitude, 'longitude': new_place.longitude, 'owner': new_place.owner, 'reviews': new_place.reviews, 
-                'amenities': new_place.amenities}, 200    
+                'latitude': new_place.latitude, 'longitude': new_place.longitude, 'owner_id': new_place.owner_id, 'reviews': new_place.reviews, 
+                'amenities': new_place.amenities}, 201
 
     @api.response(200, 'List of places retrieved successfully')
     @api.response(404, 'Places not found')
@@ -64,7 +64,7 @@ class PlaceResource(Resource):
         if not place:
             return {'error': 'Place not found'}, 404
         return {'id': place.id, 'title': place.title, 'description': place.description, 'price': place.price, 
-                'latitude': place.latitude, 'longitude': place.longitude, 'owner': place.owner, 'reviews': place.reviews, 
+                'latitude': place.latitude, 'longitude': place.longitude, 'owner_id': place.owner_id, 'reviews': place.reviews, 
                 'amenities': place.amenities}, 200
 
     @api.expect(place_model, validate=True)
@@ -82,5 +82,5 @@ class PlaceResource(Resource):
         except:
             return "Invalid Input Data", 400
         return {'id': place_id, 'title': updated_place.title, 'description': updated_place.description, 'price': updated_place.price, 
-                'latitude': updated_place.latitude, 'longitude': updated_place.longitude, 'owner': updated_place.owner, 'reviews': updated_place.reviews, 
+                'latitude': updated_place.latitude, 'longitude': updated_place.longitude, 'owner_id': updated_place.owner_id, 'reviews': updated_place.reviews, 
                 'amenities': updated_place.amenities}, 200

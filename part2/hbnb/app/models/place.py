@@ -3,16 +3,16 @@ from app.services import facade
 
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, latitude, longitude, owner):
+    def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
         super().__init__()
         self.title = title #protected attribute
         self.description = description #public attribute
         self.price = price #private attribute
         self.latitude = latitude #private attribute
         self.longitude = longitude #private attribute
-        self.owner = owner #private attribute
+        self.owner_id = owner_id #private attribute
         self.reviews = []  # List to store related reviews
-        self.amenities = []  # List to store related amenities
+        self.amenities = amenities if amenities else []
 
     def add_review(self, review):
         """Add a review to the place."""
@@ -20,11 +20,22 @@ class Place(BaseModel):
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
+        from app.models.amenity import Amenity
+        if isinstance(amenity, Amenity):
+            amenity = amenity.id
         self.amenities.append(amenity)
 
     def to_dict(self):
-        return {'id': self.id, 'title': self.title, 'description': self.description, 'price': self.price, 'latitude': self.latitude, 
-                'longitude': self.longitude, 'owner': self.owner}
+        return {'id': self.id,
+                'title': self.title,
+                'description': self.description,
+                'price': self.price,
+                'latitude': self.latitude, 
+                'longitude': self.longitude,
+                'owner_id': self.owner_id,
+                'reviews' : self.reviews,
+                'amenities': self.amenities
+            }
 
 
     @property
@@ -49,7 +60,7 @@ class Place(BaseModel):
     @price.setter
     def price(self, value):
         """setter for price (private property)"""
-        if not isinstance(value, float):
+        if not isinstance(value, (int, float)):
             raise TypeError("The price should be an float")
         if value >= 0:
             self.__price = value
@@ -64,7 +75,7 @@ class Place(BaseModel):
     @latitude.setter
     def latitude(self, value):
         """setter for latitude (private property)"""
-        if not isinstance(value, float):
+        if not isinstance(value, (int, float)):
             raise TypeError("The latitude should be a float")
         if value >= -90 and value <= 90:
             self.__latitude = value
@@ -79,7 +90,7 @@ class Place(BaseModel):
     @longitude.setter
     def longitude(self, value):
         """setter for longitude (private property)"""
-        if not isinstance(value, float):
+        if not isinstance(value, (int, float)):
             raise TypeError("The longitude should be a float")
         if value >= -180 and value <= 180:
             self.__longitude = value
@@ -87,13 +98,20 @@ class Place(BaseModel):
             raise ValueError("The longitude must be between -180 and +180.")
     
     @property
-    def owner(self):
+    def owner_id(self):
         """getter for owner (private property)"""
-        return self.__owner
+        return self.__owner_id
     
-    @owner.setter
-    def owner(self, value):
-        self.__owner = value        
+    @owner_id.setter
+    def owner_id(self, value):
+        from app.models.user import User
+        if isinstance(value, User):
+            self.__owner_id = value.id
+        elif isinstance(value, str):
+            self.__owner_id = value
+        else:
+            raise TypeError('Owner must be a tupple of type User or a string')
+        
         """
         user_mail = facade.get_user_by_email(value)
         if user_mail:

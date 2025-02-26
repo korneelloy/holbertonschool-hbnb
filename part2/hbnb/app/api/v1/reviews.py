@@ -7,8 +7,8 @@ api = Namespace('reviews', description='Review operations')
 review_model = api.model('Review', {
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'comment': fields.String(required=True, description='Text of the review'),
-    'user_id': fields.String(required=True, description='ID of the user'),
-    'place_id': fields.String(required=True, description='ID of the place')
+    'user': fields.String(required=True, description='ID of the user'),
+    'place': fields.String(required=True, description='ID of the place')
 })
 
 @api.route('/')
@@ -20,6 +20,7 @@ class ReviewList(Resource):
         """Register a new review"""
         review_data = api.payload
         try:
+            print (review_data)
             new_review = facade.create_review(review_data)
         except:
             return "Invalid Input Data", 400
