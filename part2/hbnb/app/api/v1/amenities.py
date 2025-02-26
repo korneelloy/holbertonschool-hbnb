@@ -16,13 +16,18 @@ class AmenityList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
-        # Placeholder for the logic to register a new amenity
-        pass
+        amenity_data = api.payload
+        try:
+            new_amenity = facade.create_amenity(amenity_data)
+        except:
+            return "Invalid Input Data", 400
+        return {'id': new_amenity.id, 'name': new_amenity.name, 'description': new_amenity.description}, 200
+
 
     @api.response(200, 'List of amenities retrieved successfully')
+    @api.response(404, 'Amenities not found')
     def get(self):
         """Retrieve a list of all amenities"""
-        # Placeholder for logic to return a list of all amenities
         pass
 
 @api.route('/<amenity_id>')

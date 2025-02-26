@@ -26,7 +26,7 @@ class Review(BaseModel):
 
     @comment.setter
     def comment(self, value):
-        pattern = r'^[a-zA-Z0-9!.,?: ]+$'
+        pattern = r'^[a-zA-Z0-9éèà!.,?:\'\s-]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._comment = value
         else:

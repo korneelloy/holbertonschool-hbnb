@@ -60,14 +60,16 @@ class HBnBFacade:
         return amenity
 
     def update_amenity(self, amenity_id, amenity_data):
-        # Placeholder for logic to update an amenity
-        pass
+        self.amenity_repo.update(amenity_id, amenity_data)
+        return self.amenity_repo.get(amenity_id)
 
     def get_amenity(self, amenity_id):
        return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
-        return self.amenity_repo
+        amenities = self.amenity_repo.get_all()
+        amenity_list = [amenity.to_dict() for amenity in amenities]
+        return amenity_list
 
     def create_review(self, review_data):
         # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
