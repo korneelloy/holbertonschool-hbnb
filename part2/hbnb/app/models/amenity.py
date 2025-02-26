@@ -13,7 +13,7 @@ class Amenity(BaseModel):
         self.places.append(place)
 
     def to_dict(self):
-        return {'amenity_id': self.id, 'name': self.name, 'description': self.description, 'places': self.places}
+        return {'amenity_id': self.id, 'name': self.name}
 
     @property
     def name(self):
