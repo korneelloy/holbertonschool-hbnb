@@ -52,8 +52,9 @@ class HBnBFacade:
         return self.place_repo.get()
 
     def get_all_places(self):
-        # Placeholder for logic to retrieve all places
-        pass
+        places = self.place_repo.get_all()
+        place_list = [place.to_dict() for place in places]
+        return place_list
 
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
