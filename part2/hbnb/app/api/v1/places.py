@@ -26,7 +26,7 @@ place_model = api.model('Place', {
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
 })
 
 @api.route('/')
@@ -41,9 +41,17 @@ class PlaceList(Resource):
             new_place = facade.create_place(place_data)
         except:
             return "Invalid Input Data", 400
-        return {'id': new_place.id, 'title': new_place.title, 'description': new_place.description, 'price': new_place.price, 
-                'latitude': new_place.latitude, 'longitude': new_place.longitude, 'owner': new_place.owner, 'reviews': new_place.reviews, 
-                'amenities': new_place.amenities}, 200    
+        return {
+            'id': new_place.id,
+            'title': new_place.title,
+            'description': new_place.description,
+            'price': new_place.price,
+            'latitude': new_place.latitude,
+            'longitude': new_place.longitude,
+            'owner_id': new_place.owner,
+            'reviews': new_place.reviews,
+            'amenities': new_place.amenities
+            }, 201
 
     @api.response(200, 'List of places retrieved successfully')
     @api.response(404, 'Places not found')
@@ -63,9 +71,17 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
-        return {'id': place.id, 'title': place.title, 'description': place.description, 'price': place.price, 
-                'latitude': place.latitude, 'longitude': place.longitude, 'owner': place.owner, 'reviews': place.reviews, 
-                'amenities': place.amenities}, 200
+        return {
+            'id': place.id,
+            'title': place.title,
+            'description': place.description,
+            'price': place.price,
+            'latitude': place.latitude,
+            'longitude': place.longitude,
+            'owner_id': place.owner,
+            'reviews': place.reviews, 
+            'amenities': place.amenities
+            }, 200
 
     @api.expect(place_model, validate=True)
     @api.response(200, 'Place updated successfully')
@@ -81,6 +97,14 @@ class PlaceResource(Resource):
             updated_place = facade.update_place(place_id, place_data)
         except:
             return "Invalid Input Data", 400
-        return {'id': place_id, 'title': updated_place.title, 'description': updated_place.description, 'price': updated_place.price, 
-                'latitude': updated_place.latitude, 'longitude': updated_place.longitude, 'owner': updated_place.owner, 'reviews': updated_place.reviews, 
-                'amenities': updated_place.amenities}, 200
+        return {
+            'id': place_id,
+            'title': updated_place.title,
+            'description': updated_place.description,
+            'price': updated_place.price,
+            'latitude': updated_place.latitude,
+            'longitude': updated_place.longitude,
+            'owner_id': updated_place.owner,
+            'reviews': updated_place.reviews, 
+            'amenities': updated_place.amenities
+            }, 200

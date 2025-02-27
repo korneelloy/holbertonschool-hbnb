@@ -79,7 +79,7 @@ class PlaceReviewList(Resource):
     def get(self, place_id):
         """Get all reviews for a specific place"""
         try:
-            facade.get_place_id(place_id)
+            facade.get_place(place_id)
         except:
             return {'error': 'Place not found'}, 404
         reviews = facade.get_reviews_by_place(place_id)

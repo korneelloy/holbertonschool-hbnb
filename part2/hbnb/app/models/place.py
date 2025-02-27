@@ -1,5 +1,4 @@
 from app.models.basemodel import BaseModel
-from app.services import facade
 
 
 class Place(BaseModel):
@@ -23,8 +22,15 @@ class Place(BaseModel):
         self.amenities.append(amenity)
 
     def to_dict(self):
-        return {'id': self.id, 'title': self.title, 'description': self.description, 'price': self.price, 'latitude': self.latitude, 
-                'longitude': self.longitude, 'owner': self.owner}
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'price': self.price,
+            'latitude': self.latitude, 
+            'longitude': self.longitude,
+            'owner': self.owner
+            }
 
 
     @property
@@ -50,7 +56,7 @@ class Place(BaseModel):
     def price(self, value):
         """setter for price (private property)"""
         if not isinstance(value, float):
-            raise TypeError("The price should be an float")
+            raise TypeError("The price should be a float")
         if value >= 0:
             self.__price = value
         else:
@@ -93,12 +99,8 @@ class Place(BaseModel):
     
     @owner.setter
     def owner(self, value):
+        if not isinstance(value, str):
+            raise TypeError('Owner must be a string')
         self.__owner = value        
-        """
-        user_mail = facade.get_user_by_email(value)
-        if user_mail:
-            self.__owner = value
-        else:
-            raise ValueError("The owner doesn't seem to exists")
-        """
+        
 
