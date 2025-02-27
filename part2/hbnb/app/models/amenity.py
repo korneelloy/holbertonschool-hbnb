@@ -35,7 +35,7 @@ class Amenity(BaseModel):
     
     @description.setter
     def description(self, value):
-        pattern = r'^[a-zA-Z0-9éèà!.,?:\'\s-]+$'
+        pattern = r'^[a-zA-Z0-9éèàç!.,?:\'\s-]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._description = value
         else:

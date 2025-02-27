@@ -87,8 +87,13 @@ class HBnBFacade:
         return review_list
 
     def get_reviews_by_place(self, place_id):
-        return self.review_repo.get_by_attribute('place_id', place_id)
-        pass
+        reviews = self.get_all_reviews()
+        review_list = []
+        for review in reviews:
+            if review['place_id'] == place_id:
+                review_list.append(review)
+        return review_list
+        
 
     def delete_review(self, review_id):
         # Placeholder for logic to delete a review

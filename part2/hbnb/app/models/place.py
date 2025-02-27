@@ -1,5 +1,5 @@
 from app.models.basemodel import BaseModel
-
+from app.services import facade
 
 class Place(BaseModel):
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
@@ -47,6 +47,8 @@ class Place(BaseModel):
         """setter for title (protected property to check lenght)"""
         if not isinstance(value, str):
             raise TypeError("The title should be a string")
+        if len(value) < 5:
+            raise ValueError("Title cannot be less than 5 characters")
         if len(value) >= 100:
             raise ValueError("Title cannot be longer than 100 characters")
         self._title = value
@@ -110,12 +112,3 @@ class Place(BaseModel):
             self.__owner_id = value
         else:
             raise TypeError('Owner must be a tupple of type User or a string')
-        
-        """
-        user_mail = facade.get_user_by_email(value)
-        if user_mail:
-            self.__owner = value
-        else:
-            raise ValueError("The owner doesn't seem to exists")
-        """
-

@@ -9,6 +9,15 @@ class Review(BaseModel):
         self.place_id = place_id #private attribute
         self.user_id = user_id #private attribute
 
+    def to_dict(self):
+        return {
+            'review_id': self.id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'place_id': self.place_id,
+            'user_id': self.user_id
+            }
+
     @property
     def rating(self):
         return self._rating
@@ -26,7 +35,7 @@ class Review(BaseModel):
 
     @comment.setter
     def comment(self, value):
-        pattern = r'^[a-zA-Z0-9éèà!.,?:\'\s-]+$'
+        pattern = r'^[a-zA-Z0-9éèàç!.,?:\'\s-]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._comment = value
         else:
