@@ -19,8 +19,21 @@ class ReviewList(Resource):
     def post(self):
         """Register a new review"""
         review_data = api.payload
+        if facade.get_user(review_data['user_id']) is None:
+            return "Invalid input data", 400
+        if facade.get_place(review_data['place_id']) is None:
+            return "Invalid input data", 400
+        
+        place = facade.get_place(review_data['place_id'])
+        owner_id = place.owner_id
+        print(owner_id)
+
+        owner_id_in_review_data = review_data['user_id']
+        print(owner_id_in_review_data)
+
+        if owner_id == owner_id_in_review_data:
+            return "Vithushan, don't try cheating on us, you mxxxxxx", 400
         try:
-            
             new_review = facade.create_review(review_data)
         except:
             return "Invalid Input Data", 400
@@ -67,6 +80,10 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
+        if facade.get_user(review_data['user_id']) is None:
+            return "Invalid input data", 400
+        if facade.get_place(review_data['place_id']) is None:
+            return "Invalid input data", 400
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_review = facade.get_review(review_id)
         if not existing_review:
