@@ -3,13 +3,14 @@ from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
-# Define the review model for input validation and documentation
+"""Define the review model for input validation and documentation"""
 review_model = api.model('Review', {
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'comment': fields.String(required=True, description='Text of the review'),
     'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
 })
+
 
 @api.route('/')
 class ReviewList(Resource):
@@ -20,21 +21,18 @@ class ReviewList(Resource):
         """Register a new review"""
         review_data = api.payload
         if facade.get_user(review_data['user_id']) is None:
-            return "Invalid input data", 400
+            return {"error": "Invalid Input Data"}, 400
         if facade.get_place(review_data['place_id']) is None:
-            return "Invalid input data", 400
-        
+            return {"error": "Invalid Input Data"}, 400     
         place = facade.get_place(review_data['place_id'])
         owner_id = place.owner_id
-
         owner_id_in_review_data = review_data['user_id']
-
         if owner_id == owner_id_in_review_data:
-            return "Vithushan, don't try cheating on us, you mxxxxxx", 400
+            return {"error": "Vithushan, don't try cheating on us, you mxxxxxx"}, 400
         try:
             new_review = facade.create_review(review_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': new_review.id,
             'rating': new_review.rating,
@@ -71,6 +69,7 @@ class ReviewResource(Resource):
             'place_id': review.place_id
             }, 200
 
+
     @api.expect(review_model, validate=True)
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
@@ -79,17 +78,16 @@ class ReviewResource(Resource):
         """Update a review's information"""
         review_data = api.payload
         if facade.get_user(review_data['user_id']) is None:
-            return "Invalid input data", 400
+            return {"error": "Invalid Input Data"}, 400
         if facade.get_place(review_data['place_id']) is None:
-            return "Invalid input data", 400
-        # Simulate email uniqueness check (to be replaced by real validation with persistence)
+            return {"error": "Invalid Input Data"}, 400
         existing_review = facade.get_review(review_id)
         if not existing_review:
             return {'error': 'Review not found'}, 404
         try:
             updated_review = facade.update_review(review_id, review_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': review_id,
             'rating': updated_review.rating,
@@ -103,8 +101,13 @@ class ReviewResource(Resource):
     @api.response(404, 'Review not found')
     def delete(self, review_id):
         """Delete a review"""
-        # Placeholder for the logic to delete a review
-        pass
+        try:
+            facade.get_review(review_id)
+        except:
+            return {"error": "Not found"}, 404
+        facade.delete_review(review_id)
+        return {"message": "Review deleted successfully"}, 200
+
 
 @api.route('/places/<place_id>/reviews')
 class PlaceReviewList(Resource):

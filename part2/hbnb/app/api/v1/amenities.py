@@ -3,11 +3,12 @@ from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
 
-# Define the amenity model for input validation and documentation
+"""Define the amenity model for input validation and documentation"""
 amenity_model = api.model('Amenity', {
     'name': fields.String(required=True, description='Name of the amenity'),
     'description': fields.String(required=True, description='Description of the amenity')
 })
+
 
 @api.route('/')
 class AmenityList(Resource):
@@ -20,12 +21,12 @@ class AmenityList(Resource):
         try:
             new_amenity = facade.create_amenity(amenity_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': new_amenity.id,
             'name': new_amenity.name,
             'description': new_amenity.description
-            }, 200
+            }, 201
 
 
     @api.response(200, 'List of amenities retrieved successfully')
@@ -36,6 +37,7 @@ class AmenityList(Resource):
         if not amenities:
             return {'error': 'Amenities not found'}, 404
         return amenities, 200
+
 
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
@@ -53,6 +55,7 @@ class AmenityResource(Resource):
             'places': amenity.places
             }, 200
 
+
     @api.expect(amenity_model, validate=True)
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
@@ -66,7 +69,7 @@ class AmenityResource(Resource):
         try:
             updated_amenity = facade.update_amenity(amenity_id, amenity_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': amenity_id,
             'name': updated_amenity.name,

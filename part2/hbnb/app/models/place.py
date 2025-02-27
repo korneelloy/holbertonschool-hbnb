@@ -13,9 +13,11 @@ class Place(BaseModel):
         self.reviews = []  # List to store related reviews
         self.amenities = amenities if amenities else []
 
+
     def add_review(self, review):
         """Add a review to the place."""
         self.reviews.append(review)
+
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
@@ -24,7 +26,9 @@ class Place(BaseModel):
             amenity = amenity.id
         self.amenities.append(amenity)
 
+
     def to_dict(self):
+        """Convert a data object to dictionary"""
         return {'id': self.id,
                 'title': self.title,
                 'description': self.description,
@@ -39,12 +43,13 @@ class Place(BaseModel):
 
     @property
     def title(self):
-        """getter for title (protected property)"""
+        """Getter for title (protected property)"""
         return self._title
+
 
     @title.setter
     def title(self, value):
-        """setter for title (protected property to check lenght)"""
+        """Setter for title (protected property to check length)"""
         if not isinstance(value, str):
             raise TypeError("The title should be a string")
         if len(value) < 5:
@@ -52,59 +57,68 @@ class Place(BaseModel):
         if len(value) >= 100:
             raise ValueError("Title cannot be longer than 100 characters")
         self._title = value
-    
+
+
     @property
     def price(self):
-        """getter for price (private property)"""
+        """Getter for price (private property)"""
         return self.__price
-    
+
+
     @price.setter
     def price(self, value):
-        """setter for price (private property)"""
+        """Setter for price (private property)"""
         if not isinstance(value, (int, float)):
-            raise TypeError("The price should be an float")
+            raise TypeError("The price should be an float or integer")
         if value >= 0:
             self.__price = value
         else:
             raise ValueError("The price must be a positive float number.")
-    
+
+
     @property
     def latitude(self):
-        """getter for latitude (private property)"""
+        """Getter for latitude (private property)"""
         return self.__latitude
-    
+
+
     @latitude.setter
     def latitude(self, value):
-        """setter for latitude (private property)"""
+        """Setter for latitude (private property)"""
         if not isinstance(value, (int, float)):
-            raise TypeError("The latitude should be a float")
+            raise TypeError("The latitude should be a float or integer")
         if value >= -90 and value <= 90:
             self.__latitude = value
         else:
             raise ValueError("The latitude must be between -90 and 90.")
-    
+
+
     @property
     def longitude(self):
-        """getter for longitude (private property)"""
+        """Getter for longitude (private property)"""
         return self.__longitude
-    
+
+
     @longitude.setter
     def longitude(self, value):
-        """setter for longitude (private property)"""
+        """Setter for longitude (private property)"""
         if not isinstance(value, (int, float)):
-            raise TypeError("The longitude should be a float")
+            raise TypeError("The longitude should be a float or integer")
         if value >= -180 and value <= 180:
             self.__longitude = value
         else:
             raise ValueError("The longitude must be between -180 and +180.")
-    
+
+
     @property
     def owner_id(self):
-        """getter for owner (private property)"""
+        """Getter for owner (private property)"""
         return self.__owner_id
-    
+
+
     @owner_id.setter
     def owner_id(self, value):
+        """Setter for owner (private property)"""
         from app.models.user import User
         if isinstance(value, User):
             self.__owner_id = value.id

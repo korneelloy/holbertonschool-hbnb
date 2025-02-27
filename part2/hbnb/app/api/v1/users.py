@@ -11,6 +11,7 @@ user_model = api.model('User', {
     'password': fields.String(required=True, description='Password of the user')
 })
 
+
 @api.route('/')
 class UserList(Resource):
     @api.expect(user_model, validate=True)
@@ -20,16 +21,21 @@ class UserList(Resource):
     def post(self):
         """Register a new user"""
         user_data = api.payload
-        # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
         try:
             new_user = facade.create_user(user_data)
         except:
-            return "Invalid Input Data", 400
-        return {'id': new_user.id, 'first_name': new_user.first_name, 'last_name': new_user.last_name, 'email': new_user.email}, 201
-    
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': new_user.id,
+            'first_name': new_user.first_name,
+            'last_name': new_user.last_name,
+            'email': new_user.email
+            }, 201
+
+
     @api.response(200, 'Users details retrieved successfully')
     @api.response(404, 'Users not found')
     def get(self):
@@ -38,6 +44,7 @@ class UserList(Resource):
         if not users:   
             return {'error': 'Users not found'}, 404
         return users, 200
+
 
 @api.route('/<user_id>')
 class UserResource(Resource):
@@ -48,7 +55,12 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
-        return {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
+        return {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email
+            }, 200
 
 
     @api.expect(user_model, validate=True)
@@ -58,12 +70,16 @@ class UserResource(Resource):
     def put(self, user_id):
         """change existing user"""
         user_data = api.payload
-        # Simulate email uniqueness check (to be replaced by real validation with persistence)
         existing_user = facade.get_user(user_id)
         if not existing_user:
             return {'error': 'User not found'}, 404
         try:
             updated_user = facade.update_user(user_id, user_data)
         except:
-            return "Invalid Input Data", 400
-        return {'id': user_id, 'first_name': updated_user.first_name, 'last_name': updated_user.last_name, 'email': updated_user.email}, 200
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': user_id,
+            'first_name': updated_user.first_name,
+            'last_name': updated_user.last_name,
+            'email': updated_user.email
+            }, 200

@@ -3,12 +3,11 @@ from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
-# Define the models for related entities
+"""Define the models for related entities"""
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity'),
     'description': fields.String(description='Description of the amenity')
-
 })
 
 user_model = api.model('PlaceUser', {
@@ -18,7 +17,6 @@ user_model = api.model('PlaceUser', {
     'email': fields.String(description='Email of the owner')
 })
 
-# Define the place model for input validation and documentation
 place_model = api.model('Place', {
     'title': fields.String(required=True, description='Title of the place'),
     'description': fields.String(description='Description of the place'),
@@ -29,6 +27,7 @@ place_model = api.model('Place', {
     'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
 })
 
+
 @api.route('/')
 class PlaceList(Resource):
     @api.expect(place_model)
@@ -38,14 +37,14 @@ class PlaceList(Resource):
         """Register a new place"""
         place_data = api.payload
         if facade.get_user(place_data['owner_id']) is None:
-            return "Invalid input data", 400
+            return {"error": "Invalid Input Data"}, 400
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
-                return "Invalid input data", 400
+                return {"error": "Invalid Input Data"}, 400
         try:
             new_place = facade.create_place(place_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': new_place.id,
             'title': new_place.title,
@@ -58,6 +57,7 @@ class PlaceList(Resource):
             'amenities': new_place.amenities
             }, 201
 
+
     @api.response(200, 'List of places retrieved successfully')
     @api.response(404, 'Places not found')
     def get(self):
@@ -66,6 +66,7 @@ class PlaceList(Resource):
         if not places:
             return {'error': 'Places not found'}, 404
         return places, 200
+
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -88,6 +89,7 @@ class PlaceResource(Resource):
             'amenities': place.amenities
             }, 200
 
+
     @api.expect(place_model, validate=True)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
@@ -99,14 +101,14 @@ class PlaceResource(Resource):
         if not existing_place:
             return {'error': 'Place not found'}, 404
         if facade.get_user(place_data['owner_id']) is None:
-            return "Invalid input data", 400
+            return {"error": "Invalid Input Data"}, 400
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
-                return "Invalid input data", 400
+                return {"error": "Invalid Input Data"}, 400
         try:
             updated_place = facade.update_place(place_id, place_data)
         except:
-            return "Invalid Input Data", 400
+            return {"error": "Invalid Input Data"}, 400
         return {
             'id': place_id,
             'title': updated_place.title,

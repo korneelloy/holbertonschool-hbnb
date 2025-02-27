@@ -32,8 +32,6 @@ class HBnBFacade:
         self.user_repo.update(user_id, user_data)
         return self.user_repo.get(user_id)
 
-
-    # Placeholder method for fetching a place by ID
     def create_place(self, place_data):
         place = Place(**place_data)
         self.place_repo.add(place)
@@ -93,8 +91,6 @@ class HBnBFacade:
             if review['place_id'] == place_id:
                 review_list.append(review)
         return review_list
-        
 
     def delete_review(self, review_id):
-        # Placeholder for logic to delete a review
-        pass
+        self.review_repo.delete(review_id)
