@@ -2,12 +2,12 @@ from app.models.basemodel import BaseModel
 import re
 
 class Review(BaseModel):
-    def __init__(self, comment, rating, place, user):
+    def __init__(self, comment, rating, place_id, user_id):
         super().__init__()
         self.rating = rating #protected attribute
         self.comment = comment #protected attribute
-        self.place = place #private attribute
-        self.user = user #private attribute
+        self.place_id = place_id #private attribute
+        self.user_id = user_id #private attribute
 
     @property
     def rating(self):
@@ -33,25 +33,29 @@ class Review(BaseModel):
             raise ValueError('Comment must be 300 characters max and have letters and/or numbers')
 
     @property
-    def place(self):
-        return self.__place
+    def place_id(self):
+        return self.__place_id
 
-    @place.setter
-    def place(self, value):
+    @place_id.setter
+    def place_id(self, value):
         from app.models.place import Place
         if isinstance(value, Place):
-            self.__place = value
+            self.__place_id = value.id
+        elif isinstance(value, str):
+            self.__place_id = value
         else:
-            raise TypeError('Place must be a tupple of type place')
+            raise TypeError('Place must be a tupple of type place or an ID')
 
     @property
-    def user(self):
-        return self.__user
+    def user_id(self):
+        return self.__user_id
 
-    @user.setter
-    def user(self, value):
+    @user_id.setter
+    def user_id(self, value):
         from app.models.user import User
         if isinstance(value, User):
-            self.__user = value
+            self.__user_id = value.id
+        elif isinstance(value, str):
+            self.__user_id = value            
         else:
             raise TypeError('User must be a tupple of type user')

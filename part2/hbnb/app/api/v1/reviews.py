@@ -20,6 +20,7 @@ class ReviewList(Resource):
         """Register a new review"""
         review_data = api.payload
         try:
+            print (review_data)
             new_review = facade.create_review(review_data)
         except:
             return "Invalid Input Data", 400
