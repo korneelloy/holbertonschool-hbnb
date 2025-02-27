@@ -26,10 +26,8 @@ class ReviewList(Resource):
         
         place = facade.get_place(review_data['place_id'])
         owner_id = place.owner_id
-        print(owner_id)
 
         owner_id_in_review_data = review_data['user_id']
-        print(owner_id_in_review_data)
 
         if owner_id == owner_id_in_review_data:
             return "Vithushan, don't try cheating on us, you mxxxxxx", 400
