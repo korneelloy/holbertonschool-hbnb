@@ -22,6 +22,11 @@ class User(BaseModel):
             }
 
 
+    def delete_review(self, review_id):
+        """Delete a review from the user when review removed."""
+        self.reviews.remove(review_id)
+
+
     @property
     def first_name(self):
         """Getter for first_name (protected property)"""

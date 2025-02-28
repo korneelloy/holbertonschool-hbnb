@@ -1,5 +1,4 @@
 from app.models.basemodel import BaseModel
-from app.services import facade
 
 class Place(BaseModel):
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
@@ -14,10 +13,13 @@ class Place(BaseModel):
         self.amenities = amenities if amenities else []
 
 
-    def add_review(self, review):
+    def add_review(self, review_id):
         """Add a review to the place."""
-        self.reviews.append(review)
+        self.reviews.append(review_id)
 
+    def delete_review(self, review_id):
+        """Delete a review from the place when review removed."""
+        self.reviews.remove(review_id)
 
     def add_amenity(self, amenity):
         """Add an amenity to the place."""

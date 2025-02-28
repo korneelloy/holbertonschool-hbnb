@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.place import Place
+from app.models.user import User
 
 api = Namespace('reviews', description='Review operations')
 
@@ -17,6 +19,7 @@ class ReviewList(Resource):
     @api.expect(review_model, validate=True)
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
+    @api.response(401, 'Unauthorized')
     def post(self):
         """Register a new review"""
         review_data = api.payload
@@ -24,15 +27,20 @@ class ReviewList(Resource):
             return {"error": "Invalid Input Data"}, 400
         if facade.get_place(review_data['place_id']) is None:
             return {"error": "Invalid Input Data"}, 400     
-        place = facade.get_place(review_data['place_id'])
-        owner_id = place.owner_id
+        var_place = facade.get_place(review_data['place_id'])
+        var_user = facade.get_user(review_data['user_id'])
+        owner_id = var_place.owner_id
         owner_id_in_review_data = review_data['user_id']
         if owner_id == owner_id_in_review_data:
-            return {"error": "Vithushan, don't try cheating on us, you mxxxxxx"}, 400
+            return {"error": "Vithushan, don't try cheating on us, you mxxxxxx"}, 401
         try:
             new_review = facade.create_review(review_data)
         except:
             return {"error": "Invalid Input Data"}, 400
+        
+        Place.add_review(var_place, new_review.id)
+        User.add_review(var_user, new_review.id)
+
         return {
             'id': new_review.id,
             'rating': new_review.rating,
@@ -102,9 +110,13 @@ class ReviewResource(Resource):
     def delete(self, review_id):
         """Delete a review"""
         try:
-            facade.get_review(review_id)
+            review = facade.get_review(review_id)
         except:
             return {"error": "Not found"}, 404
+        place = facade.get_place(review.place_id)
+        user = facade.get_user(review.user_id)
+        Place.delete_review(place, review_id)
+        User.delete_review(user, review_id)
         facade.delete_review(review_id)
         return {"message": "Review deleted successfully"}, 200
 
