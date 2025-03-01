@@ -102,7 +102,7 @@ class ReviewResource(Resource):
             'comment': updated_review.comment,
             'user_id': updated_review.user_id,
             'place_id': updated_review.place_id
-            }, 201
+            }, 200
 
 
     @api.response(200, 'Review deleted successfully')
