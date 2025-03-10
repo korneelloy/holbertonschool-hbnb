@@ -68,8 +68,8 @@ class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
     @api.response(400, 'Invalid Input Data')
     @api.response(404, 'User not found')
+    @api.doc(security="Bearer Auth")
     @jwt_required()
-
     def put(self, user_id):
         """change existing user"""
         user_data = api.payload

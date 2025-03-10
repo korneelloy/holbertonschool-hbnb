@@ -2,6 +2,8 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.models.place import Place
 from app.models.user import User
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 api = Namespace('reviews', description='Review operations')
 
@@ -20,6 +22,8 @@ class ReviewList(Resource):
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     @api.response(401, 'Unauthorized')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
     def post(self):
         """Register a new review"""
         review_data = api.payload
@@ -82,6 +86,8 @@ class ReviewResource(Resource):
     @api.response(200, 'Review updated successfully')
     @api.response(404, 'Review not found')
     @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
@@ -107,6 +113,8 @@ class ReviewResource(Resource):
 
     @api.response(200, 'Review deleted successfully')
     @api.response(404, 'Review not found')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
     def delete(self, review_id):
         """Delete a review"""
         try:
