@@ -1,5 +1,4 @@
 from app.models.basemodel import BaseModel
-from flask_bcrypt import bcrypt
 import re
 
 class User(BaseModel):
@@ -24,11 +23,13 @@ class User(BaseModel):
 
 
     def hash_password(self, password):
+        from app import bcrypt
         """Hashes the password before storing it."""
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        return (bcrypt.generate_password_hash(password).decode('utf-8'))
 
 
     def verify_password(self, password):
+        from app import bcrypt
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self.password, password)
 
@@ -101,7 +102,7 @@ class User(BaseModel):
             raise TypeError("The password should be a string")
         pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
         if re.match(pattern, value):
-            self.__password = value
+            self.__password = self.hash_password(value)
         else:
             raise ValueError("The password should be at least 8 characters long, and contain at least one upper, and one lowercase, and one digit.")
 
