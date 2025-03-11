@@ -2,6 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+
 api = Namespace('users', description='User operations')
 
 # Define the user model for input validation and documentation
@@ -72,10 +73,18 @@ class UserResource(Resource):
     @jwt_required()
     def put(self, user_id):
         """change existing user"""
+        from app import bcrypt
         user_data = api.payload
+        current_user = get_jwt_identity()
+        if user_id != current_user:
+            return {'error': 'Unauthorized action, you muts be connected to change your own details'}, 403
         existing_user = facade.get_user(user_id)
         if not existing_user:
             return {'error': 'User not found'}, 404
+        if existing_user.email != user_data["email"]:
+            return {'error': 'Unauthorized action, you cannot change your email'}, 400
+        if not (bcrypt.check_password_hash(existing_user.password, user_data["password"])):
+            return {'error': 'Unauthorized action, you cannot change your password'}, 400
         try:
             updated_user = facade.update_user(user_id, user_data)
         except:
