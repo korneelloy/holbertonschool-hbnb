@@ -24,6 +24,7 @@ class Place(BaseModel):
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         from app.models.amenity import Amenity
+        # Getting amenity ID to add it in amenities
         if isinstance(amenity, Amenity):
             amenity = amenity.id
         self.amenities.append(amenity)
@@ -52,10 +53,13 @@ class Place(BaseModel):
     @title.setter
     def title(self, value):
         """Setter for title (protected property to check length)"""
+        # Checking if title is a string
         if not isinstance(value, str):
             raise TypeError("The title should be a string")
+        # Checking the minimum length of title
         if len(value) < 5:
             raise ValueError("Title cannot be less than 5 characters")
+        # Checking the maximul length of title
         if len(value) >= 100:
             raise ValueError("Title cannot be longer than 100 characters")
         self._title = value
@@ -70,8 +74,10 @@ class Place(BaseModel):
     @price.setter
     def price(self, value):
         """Setter for price (private property)"""
+        # Checking if price is an integer or a float
         if not isinstance(value, (int, float)):
             raise TypeError("The price should be an float or integer")
+        # Ensuring that the price is not 0
         if value >= 0:
             self.__price = value
         else:
@@ -87,8 +93,10 @@ class Place(BaseModel):
     @latitude.setter
     def latitude(self, value):
         """Setter for latitude (private property)"""
+        # Checking if the latitude is an integer or a float
         if not isinstance(value, (int, float)):
             raise TypeError("The latitude should be a float or integer")
+        # Ensuring that the latitude is between -90 and 90
         if value >= -90 and value <= 90:
             self.__latitude = value
         else:
@@ -104,8 +112,10 @@ class Place(BaseModel):
     @longitude.setter
     def longitude(self, value):
         """Setter for longitude (private property)"""
+        # Checking if the longitude is an integer or a float
         if not isinstance(value, (int, float)):
             raise TypeError("The longitude should be a float or integer")
+        # Ensuring that the longitude is between -180 and 180
         if value >= -180 and value <= 180:
             self.__longitude = value
         else:
@@ -122,6 +132,7 @@ class Place(BaseModel):
     def owner_id(self, value):
         """Setter for owner (private property)"""
         from app.models.user import User
+        # Ensuring that owner_id is really an ID
         if isinstance(value, User):
             self.__owner_id = value.id
         elif isinstance(value, str):

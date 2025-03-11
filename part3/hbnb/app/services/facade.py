@@ -21,6 +21,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_all_users(self):
+        """ Getting all users and converting it to dictionary"""
         users = self.user_repo.get_all()
         user_list = [user.to_dict() for user in users]
         return user_list
@@ -63,6 +64,7 @@ class HBnBFacade:
        return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
+        """ Getting all amenities and converting it to dictionary"""
         amenities = self.amenity_repo.get_all()
         amenity_list = [amenity.to_dict() for amenity in amenities]
         return amenity_list
@@ -80,6 +82,7 @@ class HBnBFacade:
         return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
+        """ Getting all reviews and converting it to dictionary"""
         reviews = self.review_repo.get_all()
         review_list = [review.to_dict() for review in reviews]
         return review_list

@@ -48,8 +48,10 @@ class User(BaseModel):
     @first_name.setter
     def first_name(self, value):
         """Setter for first_name (protected property to check lenght)"""
+        # Checking if first name is a string
         if not isinstance(value, str):
             raise TypeError("First name should be a string")
+        # Checking the length of the first name
         if len(value) >= 50 or len(value) < 2:
             raise ValueError("First name cannot be longer than 50 characters or shorter than 2 characters")
         self._first_name = value
@@ -64,8 +66,10 @@ class User(BaseModel):
     @last_name.setter
     def last_name(self, value):
         """Setter for last_name (protected property to check lenght)"""
+        # Checking if the last_name is a string
         if not isinstance(value, str):
             raise TypeError("Last name should be a string")
+        # Checking the length of the last_name
         if len(value) >= 50 or len(value) < 2:
             raise ValueError("Last name cannot be longer than 50 characters or shorter than 2 characters")
         self._last_name = value
@@ -80,8 +84,10 @@ class User(BaseModel):
     @email.setter
     def email(self, value):
         """Setter for email (private property)"""
+        # Checking if the email is a string
         if not isinstance(value, str):
             raise TypeError("The email should be a string")
+        # Handling allowed characters in email
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if re.match(pattern, value):
             self.__email = value
@@ -98,8 +104,10 @@ class User(BaseModel):
     @password.setter
     def password(self, value):
         """Setter for password (private property)"""
+        # Checking if the password is a string
         if not isinstance(value, str):
             raise TypeError("The password should be a string")
+        # Handling allowed characters in password
         pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
         if re.match(pattern, value):
             self.__password = self.hash_password(value)

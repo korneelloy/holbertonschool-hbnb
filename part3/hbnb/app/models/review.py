@@ -30,6 +30,7 @@ class Review(BaseModel):
     @rating.setter
     def rating(self, value):
         """Setter for rating (protected property to check value range)"""
+        # Rating must be between 1 and 5
         if 1 <= value <= 5:
             self._rating = value
         else:
@@ -45,6 +46,7 @@ class Review(BaseModel):
     @comment.setter
     def comment(self, value):
         """Setter for comment (protected property to check validity and length)"""
+        # Handling allowed characters in comment
         pattern = r'^[a-zA-Z0-9éèàç!.,?:\'\s-]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._comment = value
@@ -62,6 +64,7 @@ class Review(BaseModel):
     def place_id(self, value):
         """Setter for place_id (private property)"""
         from app.models.place import Place
+        # Here we ensure that place_id is an ID
         if isinstance(value, Place):
             self.__place_id = value.id
         elif isinstance(value, str):
@@ -80,6 +83,7 @@ class Review(BaseModel):
     def user_id(self, value):
         """Setter for user_id (private property)"""
         from app.models.user import User
+        # Here we ensure that user_id is an ID
         if isinstance(value, User):
             self.__user_id = value.id
         elif isinstance(value, str):

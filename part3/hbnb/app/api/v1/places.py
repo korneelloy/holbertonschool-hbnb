@@ -41,14 +41,18 @@ class PlaceList(Resource):
     def post(self):
         """Register a new place"""
         place_data = api.payload
+        # Ensuring that the user exist
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        # Checking if the user is logged
         current_user = get_jwt_identity()
         if place_data['owner_id'] != current_user:
             return {'error': 'Unauthorized action, you must be logged in to create a place'}, 403
+        # Ensuring that place got amenity
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
+        # Creating the place
         try:
             new_place = facade.create_place(place_data)
         except:
@@ -108,16 +112,21 @@ class PlaceResource(Resource):
         """Update a place's information"""
         place_data = api.payload
         current_user = get_jwt_identity()
+        # Ensuring that the place exist
         existing_place = facade.get_place(place_id)
         if not existing_place:
             return {'error': 'Place not found'}, 404
+        # Checking the owner/user existence
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        # Ensuring that the owner is the user logged in
         if place_data['owner_id'] != current_user:
             return {'error': 'Unauthorized action, you must be the owner to update the place'}, 403
+        # Ensuring that the place have amenity
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
+        # Updating informations of the place
         try:
             updated_place = facade.update_place(place_id, place_data)
         except:

@@ -32,8 +32,10 @@ class Amenity(BaseModel):
     @name.setter
     def name(self, value):
         """Setter for name (protected property to check type + length)"""
+        # Checking if the name is a string
         if not isinstance(value, str):
             raise TypeError("The name should be a string")
+        # Ensuring that the name length is between 2 and 50 characters
         if len(value) >= 50 or len(value) < 2:
             raise ValueError("Name cannot be less than 2 nor longer than 50 characters")
         self._name = value
@@ -46,6 +48,7 @@ class Amenity(BaseModel):
     @description.setter
     def description(self, value):
         """Setter for description (protected property to check validity + length)"""
+        # Handling allowed characters for the description
         pattern = r'^[a-zA-Z0-9éèàç!.,?:\'\s-]+$'
         if re.match(pattern, value) and len(pattern) < 300:
             self._description = value
