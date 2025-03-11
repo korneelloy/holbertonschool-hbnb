@@ -33,7 +33,12 @@ class ReviewList(Resource):
         if review_data['user_id'] != current_user:
             return {'error': 'Unauthorized action, you must be logged in to review a place'}, 403
         if facade.get_place(review_data['place_id']) is None:
-            return {"error": "Invalid Input Data"}, 400     
+            return {"error": "Invalid Input Data"}, 400        
+        reviews = facade.get_reviews_by_place(review_data['place_id'])
+        if reviews != []:
+            for review in reviews:
+                if review['user_id'] == current_user:
+                    return {'error': 'Unauthorized action, you have already reviewed this place'}, 400
         var_place = facade.get_place(review_data['place_id'])
         var_user = facade.get_user(review_data['user_id'])
         owner_id = var_place.owner_id
