@@ -135,3 +135,4 @@ class User(BaseModel):
     def add_review(self, review):
         """Add a review to the User (One-to-many relationship)"""
         self.reviews.append(review)
+

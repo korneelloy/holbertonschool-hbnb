@@ -3,7 +3,7 @@ from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
-api = Namespace('users', description='User operations')
+api = Namespace('admin', description='Admin operations')
 
 
 # Define the user model for input validation and documentation
@@ -15,8 +15,8 @@ user_model = api.model('User', {
 })
 
 
-@api.route('/')
-class UserList(Resource):
+@api.route('/users/')
+class AdminUserCreate(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created') 
     @api.response(400, 'Email already registered')
@@ -40,23 +40,25 @@ class UserList(Resource):
             'last_name': new_user.last_name,
             'email': new_user.email
             }, 201
-
+    
+    """
     @api.response(200, 'Users details retrieved successfully')
     @api.response(404, 'Users not found')
     def get(self):
-        """Get users"""
+        Get users
         users = facade.get_all_users()
         if not users:   
             return {'error': 'Users not found'}, 404
         return users, 200
+    """
 
-
-@api.route('/<user_id>')
-class UserResource(Resource):
+@api.route('/users/<user_id>')
+class AdminUserModify(Resource):
+    """
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID"""
+        Get user details by ID
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -66,7 +68,7 @@ class UserResource(Resource):
             'last_name': user.last_name,
             'email': user.email
             }, 200
-
+    """
 
     @api.expect(user_model, validate=True)
     @api.response(200, 'User details retrieved successfully')
