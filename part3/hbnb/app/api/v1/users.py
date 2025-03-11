@@ -80,17 +80,17 @@ class UserResource(Resource):
         current_user = get_jwt_identity()
         # Checking if the user is the one that be logged in
         if user_id != current_user:
-            return {'error': 'Unauthorized action, you muts be connected to change your own details'}, 403
+            return {'error': 'Unauthorized action'}, 403
         # Checking if the user exist
         existing_user = facade.get_user(user_id)
         if not existing_user:
             return {'error': 'User not found'}, 404
         # Ensuring that the user don't modify his email
         if existing_user.email != user_data["email"]:
-            return {'error': 'Unauthorized action, you cannot change your email'}, 400
+            return {'error': 'You cannot modify email or password'}, 400
         # Ensuring that the user don't modify his password
         if not (bcrypt.check_password_hash(existing_user.password, user_data["password"])):
-            return {'error': 'Unauthorized action, you cannot change your password'}, 400
+            return {'error': 'You cannot modify email or password'}, 400
         # Updating user informations
         try:
             updated_user = facade.update_user(user_id, user_data)

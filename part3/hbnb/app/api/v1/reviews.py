@@ -43,13 +43,14 @@ class ReviewList(Resource):
             for review in reviews:
                 if review['user_id'] == current_user:
                     return {'error': 'Unauthorized action, you have already reviewed this place'}, 400
-        # Creating the review
         var_place = facade.get_place(review_data['place_id'])
         var_user = facade.get_user(review_data['user_id'])
         owner_id = var_place.owner_id
         owner_id_in_review_data = review_data['user_id']
+        # Ensuring that review belongs to a place the user does not own
         if owner_id == owner_id_in_review_data:
-            return {"error": "Vithushan, don't try cheating on us, you mxxxxxx"}, 401
+            return {"error": "You cannot review your own place"}, 400
+        # Creating the review
         try:
             new_review = facade.create_review(review_data)
         except:
@@ -110,7 +111,7 @@ class ReviewResource(Resource):
             return {"error": "Invalid Input Data"}, 400
         # Verifying if the user that reviewing the place is not the owner of that place
         if review_data['user_id'] != current_user:
-            return {'error': 'Unauthorized action, you must be the owner of the review to update it'}, 403
+            return {'error': 'Unauthorized action'}, 403
         # Ensuring that the place exist
         if facade.get_place(review_data['place_id']) is None:
             return {"error": "Invalid Input Data"}, 400
@@ -146,7 +147,7 @@ class ReviewResource(Resource):
             return {"error": "Not found"}, 404
         # Ensuring that the user is the owner of the review before deleting it
         if review.user_id != current_user:
-            return {'error': 'Unauthorized action, you must be the owner of the review to delete it'}, 403
+            return {'error': 'Unauthorized action'}, 403
         # Deleting the review in Place, User and Review
         place = facade.get_place(review.place_id)
         user = facade.get_user(review.user_id)
