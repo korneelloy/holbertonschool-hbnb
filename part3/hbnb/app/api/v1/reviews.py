@@ -29,6 +29,9 @@ class ReviewList(Resource):
         review_data = api.payload
         if facade.get_user(review_data['user_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        current_user = get_jwt_identity()
+        if review_data['user_id'] != current_user:
+            return {'error': 'Unauthorized action, you must be logged in to review a place'}, 403
         if facade.get_place(review_data['place_id']) is None:
             return {"error": "Invalid Input Data"}, 400     
         var_place = facade.get_place(review_data['place_id'])
@@ -41,7 +44,7 @@ class ReviewList(Resource):
             new_review = facade.create_review(review_data)
         except:
             return {"error": "Invalid Input Data"}, 400
-        
+
         Place.add_review(var_place, new_review.id)
         User.add_review(var_user, new_review.id)
 
@@ -91,8 +94,11 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
+        current_user = get_jwt_identity()
         if facade.get_user(review_data['user_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        if review_data['user_id'] != current_user:
+            return {'error': 'Unauthorized action, you must be the owner of the review to update it'}, 403
         if facade.get_place(review_data['place_id']) is None:
             return {"error": "Invalid Input Data"}, 400
         existing_review = facade.get_review(review_id)
@@ -117,10 +123,13 @@ class ReviewResource(Resource):
     @jwt_required()
     def delete(self, review_id):
         """Delete a review"""
+        current_user = get_jwt_identity()
         try:
             review = facade.get_review(review_id)
         except:
             return {"error": "Not found"}, 404
+        if review.user_id != current_user:
+            return {'error': 'Unauthorized action, you must be the owner of the review to delete it'}, 403
         place = facade.get_place(review.place_id)
         user = facade.get_user(review.user_id)
         Place.delete_review(place, review_id)

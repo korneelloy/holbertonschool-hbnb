@@ -43,6 +43,9 @@ class PlaceList(Resource):
         place_data = api.payload
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        current_user = get_jwt_identity()
+        if place_data['owner_id'] != current_user:
+            return {'error': 'Unauthorized action, you must be logged in to create a place'}, 403
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
@@ -105,13 +108,13 @@ class PlaceResource(Resource):
         """Update a place's information"""
         place_data = api.payload
         current_user = get_jwt_identity()
-        if place_data['owner_id'] != current_user:
-            return {'error': 'Unauthorized action'}, 403
         existing_place = facade.get_place(place_id)
         if not existing_place:
             return {'error': 'Place not found'}, 404
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
+        if place_data['owner_id'] != current_user:
+            return {'error': 'Unauthorized action, you must be the owner to update the place'}, 403
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
