@@ -123,7 +123,7 @@ class PlaceResource(Resource):
         # Ensuring that the owner is the user logged in
         if place_data['owner_id'] != current_user:
             return {'error': 'Unauthorized action'}, 403
-        # Ensuring that the place have amenity
+        # Ensuring that the place amenity exist
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400

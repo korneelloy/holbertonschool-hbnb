@@ -51,6 +51,9 @@ class HBnBFacade:
         place_list = [place.to_dict() for place in places]
         return place_list
 
+    def delete_place(self, place_id):
+        self.place_repo.delete(place_id)
+
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
         self.amenity_repo.add(amenity)

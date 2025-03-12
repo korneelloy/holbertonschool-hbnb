@@ -23,6 +23,16 @@ amenity_model = api.model('Amenity', {
 })
 
 
+place_model = api.model('Place', {
+    'title': fields.String(required=True, description='Title of the place'),
+    'description': fields.String(description='Description of the place'),
+    'price': fields.Float(required=True, description='Price per night'),
+    'latitude': fields.Float(required=True, description='Latitude of the place'),
+    'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
+})
+
+
 @api.route('/users/')
 class AdminUserCreate(Resource):
     @api.expect(user_model, validate=True)
@@ -111,7 +121,7 @@ class AdminUserModify(Resource):
 
         # Checking existence of the user's email
         existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user:
+        if existing_user and existing_user.id != user_id:
             return {'error': 'Email already registered'}, 400
 
         # Updating user informations
@@ -211,3 +221,76 @@ class AdminAmenityModify(Resource):
             'description': updated_amenity.description
             }, 200
 
+
+@api.route('/places/<place_id>')
+class AdminPlaceModify(Resource):
+    @api.expect(place_model, validate=True)
+    @api.response(200, 'Place updated successfully')
+    @api.response(404, 'Place not found')
+    @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def put(self, place_id):
+        """Update a place's information"""
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
+        place_data = api.payload
+
+        # Ensuring that the place exist
+        existing_place = facade.get_place(place_id)
+        if not existing_place:
+            return {'error': 'Place not found'}, 404
+
+        # Ensuring that the place amenity exist
+        for amenity in place_data['amenities']:
+            if facade.get_amenity(amenity) is None:
+                return {"error": "Invalid Input Data"}, 400
+
+        # Updating informations of the place
+        try:
+            updated_place = facade.update_place(place_id, place_data)
+        except:
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': place_id,
+            'title': updated_place.title,
+            'description': updated_place.description,
+            'price': updated_place.price,
+            'latitude': updated_place.latitude,
+            'longitude': updated_place.longitude,
+            'owner_id': updated_place.owner_id,
+            'reviews': updated_place.reviews, 
+            'amenities': updated_place.amenities
+            }, 200
+
+
+    @api.response(200, 'Place deleted successfully')
+    @api.response(404, 'Place not found')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a review"""
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
+        # Ensuring that the targeted place exist
+        try:
+            facade.get_place(place_id)
+        except:
+            return {"error": "Not found"}, 404
+
+        # Deleting all reviews attached to the place
+        all_reviews = facade.get_reviews_by_place(place_id)
+        for review in all_reviews:
+            facade.delete_review(review['id'])
+
+        # Deleting the place
+        facade.delete_place(place_id)
+        return {"message": "Place deleted successfully"}, 200

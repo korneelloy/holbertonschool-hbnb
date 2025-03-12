@@ -32,8 +32,8 @@ user1 = user_ids[0] if len(user_ids) > 0 else None
 BASE_URL2 = "http://127.0.0.1:5000/api/v1/auth/login"
 
 token_data = {  # ✅ Fixed this from list to dictionary
-    "email": "vit@vit.com",
-    "password": "Vit123456"
+    "email": "admin@admin.com",
+    "password": "Admin123456"
 }
 
 response = requests.post(BASE_URL2, json=token_data)
