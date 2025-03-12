@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from app.models.place import Place
+from app.models.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 
@@ -33,6 +35,14 @@ place_model = api.model('Place', {
 })
 
 
+review_model = api.model('Review', {
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+    'comment': fields.String(required=True, description='Text of the review'),
+    'user_id': fields.String(required=True, description='ID of the user'),
+    'place_id': fields.String(required=True, description='ID of the place')
+})
+
+
 @api.route('/users/')
 class AdminUserCreate(Resource):
     @api.expect(user_model, validate=True)
@@ -42,6 +52,7 @@ class AdminUserCreate(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def post(self):
+        """Register a new user"""
 
         # Ensuring that the user is admin
         claims = get_jwt()
@@ -49,7 +60,6 @@ class AdminUserCreate(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
         
-        """Register a new user"""
         user_data = api.payload
 
         # Checking existence of the user's email
@@ -104,6 +114,7 @@ class AdminUserModify(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def put(self, user_id):
+        """change existing user"""
 
         # Ensuring that the user is admin
         claims = get_jwt()
@@ -111,7 +122,6 @@ class AdminUserModify(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
-        """change existing user"""
         user_data = api.payload
   
         # Checking if the user exist
@@ -144,13 +154,14 @@ class AdminAmenityCreate(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def post(self):
+        """Register a new amenity"""
+        
         # Ensuring that the user is admin
         claims = get_jwt()
         is_admin = claims.get("is_admin", False)
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
-        """Register a new amenity"""
         amenity_data = api.payload
         try:
             new_amenity = facade.create_amenity(amenity_data)
@@ -198,13 +209,14 @@ class AdminAmenityModify(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def put(self, amenity_id):
+        """Update an amenity's information"""
+        
          # Ensuring that the user is admin
         claims = get_jwt()
         is_admin = claims.get("is_admin", False)
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
-        """Update an amenity's information"""
         amenity_data = api.payload
         # Ensuring that the amenity exist
         existing_amenity = facade.get_amenity(amenity_id)
@@ -273,7 +285,7 @@ class AdminPlaceModify(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def delete(self, place_id):
-        """Delete a review"""
+        """Delete a place"""
         # Ensuring that the user is admin
         claims = get_jwt()
         is_admin = claims.get("is_admin", False)
@@ -294,3 +306,75 @@ class AdminPlaceModify(Resource):
         # Deleting the place
         facade.delete_place(place_id)
         return {"message": "Place deleted successfully"}, 200
+
+@api.route('/reviews/<review_id>')
+class AdminReviewModify(Resource):
+    @api.expect(review_model, validate=True)
+    @api.response(200, 'Review updated successfully')
+    @api.response(404, 'Review not found')
+    @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def put(self, review_id):
+        """Update a review's information"""
+        review_data = api.payload
+
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
+        # Ensuring that the user exist
+        if facade.get_user(review_data['user_id']) is None:
+            return {"error": "Invalid Input Data"}, 400
+
+        # Ensuring that the place exist
+        if facade.get_place(review_data['place_id']) is None:
+            return {"error": "Invalid Input Data"}, 400
+        
+        # Ensuring that the review to modify exist
+        existing_review = facade.get_review(review_id)
+        if not existing_review:
+            return {'error': 'Review not found'}, 404
+        
+        # Modifying content of the review
+        try:
+            updated_review = facade.update_review(review_id, review_data)
+        except:
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': review_id,
+            'rating': updated_review.rating,
+            'comment': updated_review.comment,
+            'user_id': updated_review.user_id,
+            'place_id': updated_review.place_id
+            }, 200
+
+
+    @api.response(200, 'Review deleted successfully')
+    @api.response(404, 'Review not found')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def delete(self, review_id):
+        """Delete a review"""
+        
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+        
+        # Ensuring that the targeted review exist
+        try:
+            review = facade.get_review(review_id)
+        except:
+            return {"error": "Not found"}, 404
+
+        # Deleting the review in Place, User and Review
+        place = facade.get_place(review.place_id)
+        user = facade.get_user(review.user_id)
+        Place.delete_review(place, review_id)
+        User.delete_review(user, review_id)
+        facade.delete_review(review_id)
+        return {"message": "Review deleted successfully"}, 200
