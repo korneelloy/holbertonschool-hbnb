@@ -15,13 +15,29 @@ user_model = api.model('User', {
 })
 
 
+"""Define the amenity model for input validation and documentation"""
+amenity_model = api.model('Amenity', {
+    'name': fields.String(required=True, description='Name of the amenity'),
+    'description': fields.String(required=True, description='Description of the amenity')
+})
+
+
 @api.route('/users/')
 class AdminUserCreate(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created') 
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
     def post(self):
+
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+        
         """Register a new user"""
         user_data = api.payload
 
@@ -77,6 +93,13 @@ class AdminUserModify(Resource):
     @api.doc(security="Bearer Auth")
     @jwt_required()
     def put(self, user_id):
+
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
         """change existing user"""
         from app import bcrypt
         user_data = api.payload
@@ -88,17 +111,7 @@ class AdminUserModify(Resource):
         existing_user = facade.get_user(user_id)
         if not existing_user:
             return {'error': 'User not found'}, 404
-        
-        claims = get_jwt()
-        is_admin = claims.get("is_admin", False)
 
-        # Ensuring that the user don't modify his email
-        if not is_admin and existing_user.email != user_data["email"]:
-            return {'error': 'You cannot modify email or password'}, 400
-        # Ensuring that the user don't modify his password
-        if not is_admin and not (bcrypt.check_password_hash(existing_user.password, user_data["password"])):
-            return {'error': 'You cannot modify email or password'}, 400
-        
         # Checking existence of the user's email
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
@@ -115,3 +128,89 @@ class AdminUserModify(Resource):
             'last_name': updated_user.last_name,
             'email': updated_user.email
             }, 200
+
+@api.route('/amenities/')
+class AmenityList(Resource):
+    @api.expect(amenity_model)
+    @api.response(201, 'Amenity successfully created')
+    @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def post(self):
+        # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
+        """Register a new amenity"""
+        amenity_data = api.payload
+        try:
+            new_amenity = facade.create_amenity(amenity_data)
+        except:
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': new_amenity.id,
+            'name': new_amenity.name,
+            'description': new_amenity.description
+            }, 201
+
+    """ 
+    @api.response(200, 'List of amenities retrieved successfully')
+    @api.response(404, 'Amenities not found')
+    def get(self):
+        Retrieve a list of all amenities
+        amenities = facade.get_all_amenities()
+        if not amenities:
+            return {'error': 'Amenities not found'}, 404
+        return amenities, 200
+    """
+
+@api.route('/amenities/<amenity_id>')
+class AmenityResource(Resource):
+    """
+    @api.response(200, 'Amenity details retrieved successfully')
+    @api.response(404, 'Amenity not found')
+    def get(self, amenity_id):
+        Get amenity details by ID
+        amenity = facade.get_amenity(amenity_id)
+        if not amenity:
+            return {'error': 'Amenity not found'}, 404
+        return {
+            'id': amenity.id,
+            'name': amenity.name,
+            'description': amenity.description,
+            'places': amenity.places
+            }, 200
+    """
+
+    @api.expect(amenity_model, validate=True)
+    @api.response(200, 'Amenity updated successfully')
+    @api.response(404, 'Amenity not found')
+    @api.response(400, 'Invalid input data')
+    @api.doc(security="Bearer Auth")
+    @jwt_required()
+    def put(self, amenity_id):
+         # Ensuring that the user is admin
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+        if not is_admin :
+            return {'error': 'Admin privileges required'}, 403
+
+        """Update an amenity's information"""
+        amenity_data = api.payload
+        # Ensuring that the amenity exist
+        existing_amenity = facade.get_amenity(amenity_id)
+        if not existing_amenity:
+            return {'error': 'Amenity not found'}, 404
+        # Updating the amenity informations
+        try:
+            updated_amenity = facade.update_amenity(amenity_id, amenity_data)
+        except:
+            return {"error": "Invalid Input Data"}, 400
+        return {
+            'id': amenity_id,
+            'name': updated_amenity.name,
+            'description': updated_amenity.description
+            }, 200
+
