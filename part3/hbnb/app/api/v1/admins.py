@@ -11,7 +11,8 @@ user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
     'email': fields.String(required=True, description='Email of the user'),
-    'password': fields.String(required=True, description='Password of the user')
+    'password': fields.String(required=True, description='Password of the user'),
+    'is_admin': fields.Boolean(required=True, description='Administrator privilege')
 })
 
 
@@ -101,12 +102,8 @@ class AdminUserModify(Resource):
             return {'error': 'Admin privileges required'}, 403
 
         """change existing user"""
-        from app import bcrypt
         user_data = api.payload
-        current_user = get_jwt_identity()
-        # Checking if the user is the one that be logged in
-        if user_id != current_user:
-            return {'error': 'Unauthorized action'}, 403
+  
         # Checking if the user exist
         existing_user = facade.get_user(user_id)
         if not existing_user:
@@ -130,7 +127,7 @@ class AdminUserModify(Resource):
             }, 200
 
 @api.route('/amenities/')
-class AmenityList(Resource):
+class AdminAmenityCreate(Resource):
     @api.expect(amenity_model)
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
@@ -167,7 +164,7 @@ class AmenityList(Resource):
     """
 
 @api.route('/amenities/<amenity_id>')
-class AmenityResource(Resource):
+class AdminAmenityModify(Resource):
     """
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')

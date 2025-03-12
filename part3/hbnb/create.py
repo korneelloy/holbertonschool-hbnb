@@ -3,8 +3,10 @@ import requests
 BASE_URL = "http://127.0.0.1:5000/api/v1/users/"
 
 users = [
-    {"first_name": "Vithuchan", "last_name": "One", "email": "vit@vit.com", "password": "Vit123456"},
-    {"first_name": "Vithuchan", "last_name": "Two", "email": "vit2@vit.com", "password": "Vit123456"},
+    {"first_name": "Vithuchan", "last_name": "One", "email": "vit@vit.com", "password": "Vit123456", "is_admin": True},
+    {"first_name": "Vithuchan", "last_name": "Two", "email": "vit2@vit.com", "password": "Vit123456", "is_admin": False},
+    {"first_name": "admin", "last_name": "admin", "email": "admin@admin.com", "password": "Admin123456", "is_admin": True}
+
 ]
 
 user_ids = []
