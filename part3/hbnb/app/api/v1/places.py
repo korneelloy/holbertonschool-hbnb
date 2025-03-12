@@ -118,10 +118,10 @@ class PlaceResource(Resource):
         if not existing_place:
             return {'error': 'Place not found'}, 404
         # Checking the owner/user existence
-        if facade.get_user(place_data['owner_id']) is None:
+        if facade.get_user(existing_place.owner_id) is None:
             return {"error": "Invalid Input Data"}, 400
         # Ensuring that the owner is the user logged in
-        if place_data['owner_id'] != current_user:
+        if existing_place.owner_id != current_user:
             return {'error': 'Unauthorized action'}, 403
         # Ensuring that the place amenity exist
         for amenity in place_data['amenities']:
