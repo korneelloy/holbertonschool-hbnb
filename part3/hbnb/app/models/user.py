@@ -1,5 +1,7 @@
-from app.models.basemodel import BaseModel
+from app import db, bcrypt
+import uuid
 import re
+from .baseclass import BaseModel
 
 class User(BaseModel):
     def __init__(self, first_name, last_name, email, password, is_admin=False):
