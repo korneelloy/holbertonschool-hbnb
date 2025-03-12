@@ -101,10 +101,10 @@ class UserResource(Resource):
         # Ensuring that the user don't modify his password
         if not is_admin and not (bcrypt.check_password_hash(existing_user.password, user_data["password"])):
             return {'error': 'You cannot modify email or password'}, 400
-
+        
         # Checking existence of the user's email
         existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user and existing_user.id != user_id:
+        if existing_user and existing_user["id"] != user_id:
             return {'error': 'Email already registered'}, 400
 
         # Updating user informations
