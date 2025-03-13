@@ -50,9 +50,9 @@ class Place(BaseModel):
                 'price': self.price,
                 'latitude': self.latitude, 
                 'longitude': self.longitude,
-                'owner_id': self.owner_id,
-                'reviews' : self.reviews,
-                'amenities': self.amenities
+                'owner_id': self.owner_id
+                # 'reviews' : self.reviews,
+                # 'amenities': self.amenities
             }
 
 

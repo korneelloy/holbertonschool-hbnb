@@ -7,11 +7,13 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 api = Namespace('places', description='Place operations')
 
 """Define the models for related entities"""
+"""
 amenity_model = api.model('PlaceAmenity', {
     'id': fields.String(description='Amenity ID'),
     'name': fields.String(description='Name of the amenity'),
     'description': fields.String(description='Description of the amenity')
 })
+"""
 
 user_model = api.model('PlaceUser', {
     'id': fields.String(description='User ID'),
@@ -25,8 +27,8 @@ place_model = api.model('Place', {
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place'),
-    'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
+    'longitude': fields.Float(required=True, description='Longitude of the place')
+    # 'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
 })
 
 
@@ -50,9 +52,11 @@ class PlaceList(Resource):
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
         # Ensuring that place got amenity
+        """
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
+        """
         # Creating the place
         try:
             new_place = facade.create_place(place_data)
@@ -65,9 +69,9 @@ class PlaceList(Resource):
             'price': new_place.price,
             'latitude': new_place.latitude,
             'longitude': new_place.longitude,
-            'owner_id': new_place.owner_id,
-            'reviews': new_place.reviews, 
-            'amenities': new_place.amenities
+            'owner_id': new_place.owner_id
+            # 'reviews': new_place.reviews, 
+            #'amenities': new_place.amenities
             }, 201
 
 
@@ -97,9 +101,9 @@ class PlaceResource(Resource):
             'price': place.price, 
             'latitude': place.latitude,
             'longitude': place.longitude,
-            'owner_id': place.owner_id,
-            'reviews': place.reviews,
-            'amenities': place.amenities
+            'owner_id': place.owner_id
+            # 'reviews': place.reviews,
+            # 'amenities': place.amenities
             }, 200
 
 
@@ -124,9 +128,11 @@ class PlaceResource(Resource):
         if existing_place.owner_id != current_user:
             return {'error': 'Unauthorized action'}, 403
         # Ensuring that the place amenity exist
+        """
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
+        """
         # Updating informations of the place
         try:
             updated_place = facade.update_place(place_id, place_data)
@@ -139,7 +145,7 @@ class PlaceResource(Resource):
             'price': updated_place.price,
             'latitude': updated_place.latitude,
             'longitude': updated_place.longitude,
-            'owner_id': updated_place.owner_id,
-            'reviews': updated_place.reviews, 
-            'amenities': updated_place.amenities
+            'owner_id': updated_place.owner_id
+            # 'reviews': updated_place.reviews, 
+            # 'amenities': updated_place.amenities
             }, 200

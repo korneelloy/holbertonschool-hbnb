@@ -56,8 +56,8 @@ class ReviewList(Resource):
         except:
             return {"error": "Invalid Input Data"}, 400
 
-        Place.add_review(var_place, new_review.id)
-        User.add_review(var_user, new_review.id)
+        # Place.add_review(var_place, new_review.id)
+        # User.add_review(var_user, new_review.id)
 
         return {
             'id': new_review.id,
