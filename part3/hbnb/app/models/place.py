@@ -1,6 +1,17 @@
-from app.models.basemodel import BaseModel
+from .baseclass import BaseModel
+from app import db
 
 class Place(BaseModel):
+    __tablename__ = 'places'
+
+    _title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(100), nullable=False)
+    _price = db.Column(db.Float, nullable=False)
+    _latitude = db.Column(db.Float(90), nullable=False)
+    _longitude = db.Column(db.Float(180), nullable=False)
+    _owner_id = db.Column(db.String, nullable=False)
+
+    """
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
         super().__init__()
         self.title = title #protected attribute
@@ -11,6 +22,7 @@ class Place(BaseModel):
         self.owner_id = owner_id #private attribute
         self.reviews = []  # List to store related reviews
         self.amenities = amenities if amenities else []
+    """
 
 
     def add_review(self, review_id):
@@ -68,7 +80,7 @@ class Place(BaseModel):
     @property
     def price(self):
         """Getter for price (private property)"""
-        return self.__price
+        return self._price
 
 
     @price.setter
@@ -79,7 +91,7 @@ class Place(BaseModel):
             raise TypeError("The price should be an float or integer")
         # Ensuring that the price is not 0
         if value >= 0:
-            self.__price = value
+            self._price = value
         else:
             raise ValueError("The price must be a positive float number.")
 
@@ -87,7 +99,7 @@ class Place(BaseModel):
     @property
     def latitude(self):
         """Getter for latitude (private property)"""
-        return self.__latitude
+        return self._latitude
 
 
     @latitude.setter
@@ -98,7 +110,7 @@ class Place(BaseModel):
             raise TypeError("The latitude should be a float or integer")
         # Ensuring that the latitude is between -90 and 90
         if value >= -90 and value <= 90:
-            self.__latitude = value
+            self._latitude = value
         else:
             raise ValueError("The latitude must be between -90 and 90.")
 
@@ -106,7 +118,7 @@ class Place(BaseModel):
     @property
     def longitude(self):
         """Getter for longitude (private property)"""
-        return self.__longitude
+        return self._longitude
 
 
     @longitude.setter
@@ -117,7 +129,7 @@ class Place(BaseModel):
             raise TypeError("The longitude should be a float or integer")
         # Ensuring that the longitude is between -180 and 180
         if value >= -180 and value <= 180:
-            self.__longitude = value
+            self._longitude = value
         else:
             raise ValueError("The longitude must be between -180 and +180.")
 
@@ -125,7 +137,7 @@ class Place(BaseModel):
     @property
     def owner_id(self):
         """Getter for owner (private property)"""
-        return self.__owner_id
+        return self._owner_id
 
 
     @owner_id.setter
@@ -134,8 +146,8 @@ class Place(BaseModel):
         from app.models.user import User
         # Ensuring that owner_id is really an ID
         if isinstance(value, User):
-            self.__owner_id = value.id
+            self._owner_id = value.id
         elif isinstance(value, str):
-            self.__owner_id = value
+            self._owner_id = value
         else:
             raise TypeError('Owner must be a tupple of type User or a string')

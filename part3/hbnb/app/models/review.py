@@ -1,13 +1,22 @@
-from app.models.basemodel import BaseModel
+from .baseclass import BaseModel
 import re
+from app import db
 
 class Review(BaseModel):
+    __tablename__ = 'reviews'
+
+    _rating = db.Column(db.Integer, nullable=False)
+    _comment = db.Column(db.String(300), nullable=False)
+    _place_id = db.Column(db.String(128), nullable=False)
+    _user_id = db.Column(db.String(128), nullable=False)
+    """
     def __init__(self, comment, rating, place_id, user_id):
         super().__init__()
         self.rating = rating #protected attribute
         self.comment = comment #protected attribute
         self.place_id = place_id #private attribute
         self.user_id = user_id #private attribute
+    """
 
 
     def to_dict(self):
@@ -57,7 +66,7 @@ class Review(BaseModel):
     @property
     def place_id(self):
         """Getter for place_id (private property)"""
-        return self.__place_id
+        return self._place_id
 
 
     @place_id.setter
@@ -66,9 +75,9 @@ class Review(BaseModel):
         from app.models.place import Place
         # Here we ensure that place_id is an ID
         if isinstance(value, Place):
-            self.__place_id = value.id
+            self._place_id = value.id
         elif isinstance(value, str):
-            self.__place_id = value
+            self._place_id = value
         else:
             raise TypeError('Place must be a tupple of type place or an ID')
 
@@ -76,7 +85,7 @@ class Review(BaseModel):
     @property
     def user_id(self):
         """Getter for user_id (private property)"""
-        return self.__user_id
+        return self._user_id
 
 
     @user_id.setter
@@ -85,8 +94,8 @@ class Review(BaseModel):
         from app.models.user import User
         # Here we ensure that user_id is an ID
         if isinstance(value, User):
-            self.__user_id = value.id
+            self._user_id = value.id
         elif isinstance(value, str):
-            self.__user_id = value            
+            self._user_id = value            
         else:
             raise TypeError('User must be a tupple of type user')

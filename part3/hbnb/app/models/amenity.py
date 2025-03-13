@@ -1,12 +1,20 @@
-from app.models.basemodel import BaseModel
+from .baseclass import BaseModel
 import re
+from app import db
 
 class Amenity(BaseModel):
+    __tablename__ = 'amenities'
+
+    _name = db.Column(db.String(100), nullable=False)
+    _description = db.Column(db.String(100), nullable=False)
+
+    """
     def __init__(self, name, description):
         super().__init__()
         self.name = name #protected attribute
         self.description = description #protected attribute
         self.places = [] #public attribute
+    """
 
 
     def add_place(self, place):
