@@ -18,11 +18,11 @@ class User(BaseModel):
 
     __tablename__ = 'users'
 
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(128), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    _first_name = db.Column(db.String(50), nullable=False)
+    _last_name = db.Column(db.String(50), nullable=False)
+    _email = db.Column(db.String(120), nullable=False, unique=True)
+    _password = db.Column(db.String(128), nullable=False)
+    _is_admin = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
         """Convert a data object to dictionary"""
@@ -90,7 +90,7 @@ class User(BaseModel):
     @property
     def email(self):
         """Getter for email (private property)"""
-        return self.__email
+        return self._email
 
 
     @email.setter
@@ -102,7 +102,7 @@ class User(BaseModel):
         # Handling allowed characters in email
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if re.match(pattern, value):
-            self.__email = value
+            self._email = value
         else:
             raise ValueError("The email doesn't seem to be an correct email address. Please check.")
 
@@ -110,7 +110,7 @@ class User(BaseModel):
     @property
     def password(self):
         """Getter for password (private property)"""
-        return self.__password
+        return self._password
 
 
     @password.setter
@@ -122,7 +122,7 @@ class User(BaseModel):
         # Handling allowed characters in password
         pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
         if re.match(pattern, value):
-            self.__password = self.hash_password(value)
+            self._password = self.hash_password(value)
         else:
             raise ValueError("The password should be at least 8 characters long, and contain at least one upper, and one lowercase, and one digit.")
 
@@ -130,13 +130,13 @@ class User(BaseModel):
     @property
     def is_admin(self):
         """Getter for is_admin (private property)"""
-        return self.__is_admin
+        return self._is_admin
 
 
     @is_admin.setter
     def is_admin(self, value):
         """Setter for is_admin (private property)"""
-        self.__is_admin = value
+        self._is_admin = value
 
 
     def add_place(self, place):

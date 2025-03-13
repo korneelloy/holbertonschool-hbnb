@@ -36,9 +36,6 @@ class HBnBFacade:
 
 
 
-
-
-
     def create_place(self, place_data):
         place = Place(**place_data)
         self.place_repo.add(place)
