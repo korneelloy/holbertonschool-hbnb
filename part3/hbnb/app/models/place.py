@@ -1,5 +1,7 @@
 from .baseclass import BaseModel
 from app import db
+from amenity_place import amenity_place
+from place_review import place_review
 
 class Place(BaseModel):
     __tablename__ = 'places'
@@ -10,6 +12,8 @@ class Place(BaseModel):
     _latitude = db.Column(db.Float(90), nullable=False)
     _longitude = db.Column(db.Float(180), nullable=False)
     _owner_id = db.Column(db.String, nullable=False)
+    amenity = db.relationship('Amenity', secondary=amenity_place, backref=db.backref('place', lazy=True), lazy=True)
+    review = db.relationship('Review', secondary=place_review, backref=db.backref('place', lazy=True), lazy=True)
 
     """
     def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
