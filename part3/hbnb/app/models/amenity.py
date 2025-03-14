@@ -1,6 +1,9 @@
 from .baseclass import BaseModel
 import re
 from app import db
+from sqlalchemy import Column, String
+
+
 
 class Amenity(BaseModel):
     __tablename__ = 'amenities'

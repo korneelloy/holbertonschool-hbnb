@@ -1,14 +1,16 @@
 from .baseclass import BaseModel
 import re
 from app import db
+from sqlalchemy import ForeignKey
 
 class Review(BaseModel):
     __tablename__ = 'reviews'
 
     _rating = db.Column(db.Integer, nullable=False)
     _comment = db.Column(db.String(300), nullable=False)
-    _place_id = db.Column(db.String(128), nullable=False)
-    _user_id = db.Column(db.String(128), nullable=False)
+    _place_id = db.Column(db.String(128),ForeignKey('places.id'), nullable=False)
+    _user_id = db.Column(db.String(128), ForeignKey('users.id'),nullable=False)
+
     """
     def __init__(self, comment, rating, place_id, user_id):
         super().__init__()

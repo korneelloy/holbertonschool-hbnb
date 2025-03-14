@@ -1,7 +1,8 @@
-from app import db, bcrypt
-import uuid
+from app import db
 import re
 from .baseclass import BaseModel
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 
 class User(BaseModel):
     """
@@ -23,6 +24,9 @@ class User(BaseModel):
     _email = db.Column(db.String(120), nullable=False, unique=True)
     _password = db.Column(db.String(128), nullable=False)
     _is_admin = db.Column(db.Boolean, default=False)
+    places = relationship('Place', backref='user', lazy=True)
+    reviews = relationship('Review', backref='user', lazy=True)
+
 
     def to_dict(self):
         """Convert a data object to dictionary"""
