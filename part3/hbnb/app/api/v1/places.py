@@ -2,6 +2,9 @@ from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app import db
+from sqlalchemy import text
+
 
 
 api = Namespace('places', description='Place operations')
@@ -27,8 +30,8 @@ place_model = api.model('Place', {
     'description': fields.String(description='Description of the place'),
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
-    'longitude': fields.Float(required=True, description='Longitude of the place')
-    # 'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
+    'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'amenities': fields.List(fields.String(), required=True, description="List of amenities ID's")
 })
 
 
@@ -52,16 +55,29 @@ class PlaceList(Resource):
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
         # Ensuring that place got amenity
-        """
+        
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
-        """
+        
+        # putting the amenities "aside":
+        amenities = place_data['amenities']
+        place_data['amenities'] = []
+        
         # Creating the place
+        
         try:
             new_place = facade.create_place(place_data)
         except:
             return {"error": "Invalid Input Data"}, 400
+        
+        #adding amenities to amenity-place with direct sql: 
+        
+        for amenity in amenities:
+            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+            print(db.session.execute(query, {"place_id": new_place.id, "amenity_id": amenity}))
+            db.session.commit()
+
         return {
             'id': new_place.id,
             'title': new_place.title,
@@ -128,16 +144,29 @@ class PlaceResource(Resource):
         if existing_place.owner_id != current_user:
             return {'error': 'Unauthorized action'}, 403
         # Ensuring that the place amenity exist
-        """
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
-        """
+        
+
+        # putting the amenities "aside":
+        amenities = place_data['amenities']
+        place_data['amenities'] = []
+        
         # Updating informations of the place
         try:
             updated_place = facade.update_place(place_id, place_data)
         except:
             return {"error": "Invalid Input Data"}, 400
+        
+        #adding amenities to amenity-place with direct sql: 
+        
+        for amenity in amenities:
+            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+            print(db.session.execute(query, {"place_id": updated_place.id, "amenity_id": amenity}))
+            db.session.commit()
+
+
         return {
             'id': place_id,
             'title': updated_place.title,
