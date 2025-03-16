@@ -143,40 +143,78 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+
         current_user = get_jwt_identity()
+       
+        if current_user:
+            place_data['owner_id'] = current_user
+        else:
+            return {"error": "Invalid Input Data"}
+         
+        # Ensuring that the user exist
+        if facade.get_user(place_data['owner_id']) is None:
+            return {"error": "Invalid Input Data"}, 400
+
+
         # Ensuring that the place exist
         existing_place = facade.get_place(place_id)
         if not existing_place:
             return {'error': 'Place not found'}, 404
-        # Checking the owner/user existence
-        if facade.get_user(existing_place.owner_id) is None:
-            return {"error": "Invalid Input Data"}, 400
+
         # Ensuring that the owner is the user logged in
         if existing_place.owner_id != current_user:
             return {'error': 'Unauthorized action'}, 403
-        # Ensuring that the place amenity exist
+
+        # Ensuring that amenity/ies exist
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
-                return {"error": "Invalid Input Data"}, 400
+                return {"error": "Invalid Input Data"}, 400     
         
-        print(place_data)
 
         # putting the amenities "aside":
         amenities = place_data['amenities']
         place_data['amenities'] = []
+
         
-        print(place_data)
+        
         # Updating informations of the place
+
+        query = text("""
+            UPDATE places 
+            SET _title = :title, 
+            description = :description, 
+            _price = :price, 
+            _latitude = :latitude, 
+            _longitude = :longitude
+            WHERE id = :place_id
+        """)
+        print(place_data)
+
+        db.session.execute(query, {
+            "title": place_data["title"], 
+            "description": place_data["description"], 
+            "price": place_data["price"],
+            "latitude": place_data["latitude"], 
+            "longitude": place_data["longitude"], 
+            "place_id": place_id
+        })
+
+        db.session.commit()
+
+        
+        """
         try:
             updated_place = facade.update_place(place_id, place_data)
         except:
-            return {"error": "Invalid Input Data"}, 400
-        
+            return {"error": "Invalid Input Datacccc"}, 400
+        """
         #adding amenities to amenity-place with direct sql: 
         query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
         values = [{"place_id": place_id, "amenity_id": amenity} for amenity in amenities]
         db.session.execute(query, values)
         db.session.commit()
+
+        updated_place = facade.get_place(place_id)
 
         return {
             'id': place_id,
