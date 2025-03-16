@@ -73,10 +73,10 @@ class PlaceList(Resource):
         
         #adding amenities to amenity-place with direct sql: 
         
-        for amenity in amenities:
-            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
-            print(db.session.execute(query, {"place_id": new_place.id, "amenity_id": amenity}))
-            db.session.commit()
+        query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+        values = [{"place_id": new_place.id, "amenity_id": amenity} for amenity in amenities]
+        db.session.execute(query, values)
+        db.session.commit()
 
         return {
             'id': new_place.id,
@@ -110,6 +110,21 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
+        
+        print(place_id)
+        
+        """getting the amenities"""
+        query = text("SELECT amenity_id FROM amenity_place WHERE place_id = :place_id")
+        result = db.session.execute(query, {"place_id": place_id})
+        data = result.fetchall()
+        amenities = [row[0] for row in data]
+
+        """getting the amenities"""
+        query = text("SELECT id FROM reviews WHERE _place_id = :place_id")
+        result = db.session.execute(query, {"place_id": place_id})
+        data = result.fetchall()
+        reviews = [row[0] for row in data]
+
         return {
             'id': place.id,
             'title': place.title,
@@ -117,9 +132,9 @@ class PlaceResource(Resource):
             'price': place.price, 
             'latitude': place.latitude,
             'longitude': place.longitude,
-            'owner_id': place.owner_id
-            # 'reviews': place.reviews,
-            # 'amenities': place.amenities
+            'owner_id': place.owner_id,
+            'reviews': reviews,
+            'amenities': amenities
             }, 200
 
 
