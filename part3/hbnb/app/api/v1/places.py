@@ -65,14 +65,12 @@ class PlaceList(Resource):
         place_data['amenities'] = []
         
         # Creating the place
-        
         try:
             new_place = facade.create_place(place_data)
         except:
             return {"error": "Invalid Input Data"}, 400
         
         #adding amenities to amenity-place with direct sql: 
-        
         query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
         values = [{"place_id": new_place.id, "amenity_id": amenity} for amenity in amenities]
         db.session.execute(query, values)
