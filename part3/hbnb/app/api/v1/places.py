@@ -110,16 +110,14 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
-        
-        print(place_id)
-        
-        """getting the amenities"""
+                
+        """getting the amenities with direct sql"""
         query = text("SELECT amenity_id FROM amenity_place WHERE place_id = :place_id")
         result = db.session.execute(query, {"place_id": place_id})
         data = result.fetchall()
         amenities = [row[0] for row in data]
 
-        """getting the amenities"""
+        """getting the reviews with direct sql"""
         query = text("SELECT id FROM reviews WHERE _place_id = :place_id")
         result = db.session.execute(query, {"place_id": place_id})
         data = result.fetchall()
@@ -163,11 +161,13 @@ class PlaceResource(Resource):
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
         
+        print(place_data)
 
         # putting the amenities "aside":
         amenities = place_data['amenities']
         place_data['amenities'] = []
         
+        print(place_data)
         # Updating informations of the place
         try:
             updated_place = facade.update_place(place_id, place_data)
@@ -175,12 +175,10 @@ class PlaceResource(Resource):
             return {"error": "Invalid Input Data"}, 400
         
         #adding amenities to amenity-place with direct sql: 
-        
-        for amenity in amenities:
-            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
-            print(db.session.execute(query, {"place_id": updated_place.id, "amenity_id": amenity}))
-            db.session.commit()
-
+        query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+        values = [{"place_id": place_id, "amenity_id": amenity} for amenity in amenities]
+        db.session.execute(query, values)
+        db.session.commit()
 
         return {
             'id': place_id,
@@ -189,7 +187,7 @@ class PlaceResource(Resource):
             'price': updated_place.price,
             'latitude': updated_place.latitude,
             'longitude': updated_place.longitude,
-            'owner_id': updated_place.owner_id
+            'owner_id': updated_place.owner_id,
             # 'reviews': updated_place.reviews, 
-            # 'amenities': updated_place.amenities
+            'amenities': amenities
             }, 200
