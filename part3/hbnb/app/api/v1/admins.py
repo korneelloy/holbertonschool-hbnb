@@ -1,6 +1,8 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt
+from app import db
+from sqlalchemy import text
 
 
 api = Namespace('admin', description='Admin operations')
@@ -219,11 +221,46 @@ class AdminPlaceModify(Resource):
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
 
-        # Updating informations of the place
-        try:
-            updated_place = facade.update_place(place_id, place_data)
-        except:
-            return {"error": "Invalid Input Data"}, 400
+        # putting the amenities "aside":
+        amenities = place_data['amenities']
+        place_data['amenities'] = []
+
+        # Updating informations of the place with direct sql:
+        query = text("""
+            UPDATE places 
+            SET _title = :title, 
+            description = :description, 
+            _price = :price, 
+            _latitude = :latitude, 
+            _longitude = :longitude
+            WHERE id = :place_id
+        """)
+        db.session.execute(query, {
+            "title": place_data["title"], 
+            "description": place_data["description"], 
+            "price": place_data["price"],
+            "latitude": place_data["latitude"], 
+            "longitude": place_data["longitude"], 
+            "place_id": place_id
+        })
+        db.session.commit()
+
+        #deleting existing amenities with direct sql: 
+        query = text("DELETE FROM amenity_place WHERE place_id = :place_id")
+        values = {"place_id": place_id}
+        db.session.execute(query, values)
+        db.session.commit()
+
+        #adding amenities to amenity-place with direct sql: 
+        if amenities != []:
+            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+            values = [{"place_id": place_id, "amenity_id": amenity} for amenity in amenities]
+            db.session.execute(query, values)
+            db.session.commit()
+
+        #getting updated info of the place:
+        updated_place = facade.get_place(place_id)
+
         return {
             'id': place_id,
             'title': updated_place.title,
@@ -232,10 +269,8 @@ class AdminPlaceModify(Resource):
             'latitude': updated_place.latitude,
             'longitude': updated_place.longitude,
             'owner_id': updated_place.owner_id,
-            'reviews': updated_place.reviews, 
-            'amenities': updated_place.amenities
+            'amenities': amenities
             }, 200
-
 
     @api.response(200, 'Place deleted successfully')
     @api.response(404, 'Place not found')
