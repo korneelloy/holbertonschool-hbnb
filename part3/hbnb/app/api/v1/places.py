@@ -208,11 +208,19 @@ class PlaceResource(Resource):
         except:
             return {"error": "Invalid Input Datacccc"}, 400
         """
-        #adding amenities to amenity-place with direct sql: 
-        query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
-        values = [{"place_id": place_id, "amenity_id": amenity} for amenity in amenities]
+        #deleting existing amenities with direct sql: 
+        query = text("DELETE FROM amenity_place WHERE place_id = :place_id")
+        values = {"place_id": place_id}
         db.session.execute(query, values)
         db.session.commit()
+
+
+        #adding amenities to amenity-place with direct sql: 
+        if amenities != []:
+            query = text("INSERT INTO amenity_place (place_id, amenity_id) VALUES (:place_id, :amenity_id)")
+            values = [{"place_id": place_id, "amenity_id": amenity} for amenity in amenities]
+            db.session.execute(query, values)
+            db.session.commit()
 
         updated_place = facade.get_place(place_id)
 

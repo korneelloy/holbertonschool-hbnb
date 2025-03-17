@@ -374,7 +374,7 @@ class AdminReviewModify(Resource):
         # Deleting the review in Place, User and Review
         place = facade.get_place(review.place_id)
         user = facade.get_user(review.user_id)
-        Place.delete_review(place, review_id)
-        User.delete_review(user, review_id)
+        #Place.delete_review(place, review_id)
+        #User.delete_review(user, review_id)
         facade.delete_review(review_id)
         return {"message": "Review deleted successfully"}, 200
