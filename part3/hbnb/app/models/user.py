@@ -5,18 +5,6 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 class User(BaseModel):
-    """
-    def __init__(self, first_name, last_name, email, password, is_admin=False):
-        super().__init__()
-        self.first_name = first_name #protected attribute
-        self.last_name = last_name #protected attribute
-        self.email = email #private attribute
-        self.password = password #private attribute
-        self.is_admin = is_admin #private attribute
-        self.places = []
-        self.reviews = []
-    """
-
     __tablename__ = 'users'
 
     _first_name = db.Column(db.String(50), nullable=False)

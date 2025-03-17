@@ -11,15 +11,6 @@ class Amenity(BaseModel):
     _name = db.Column(db.String(100), nullable=False)
     _description = db.Column(db.String(100), nullable=False)
 
-    """
-    def __init__(self, name, description):
-        super().__init__()
-        self.name = name #protected attribute
-        self.description = description #protected attribute
-        self.places = [] #public attribute
-    """
-
-
     def add_place(self, place):
         """Add a place to Amenity (Many-to-many relationship)"""
         self.places.append(place)

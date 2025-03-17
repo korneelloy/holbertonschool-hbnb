@@ -15,22 +15,7 @@ class Place(BaseModel):
     _longitude = db.Column(db.Float(180), nullable=False)
     _owner_id = db.Column(db.String, ForeignKey('users.id'), nullable=False)
     amenities = db.relationship('Amenity', secondary=amenity_place, lazy='subquery', backref=db.backref('places', lazy=True))    
-    #review = db.relationship('Review', secondary=place_review, backref=db.backref('place', lazy=True), lazy=True)
     reviews = relationship('Review', backref='place', lazy=True)
-
-    """
-    def __init__(self, title, description, price, latitude, longitude, owner_id, amenities):
-        super().__init__()
-        self.title = title #protected attribute
-        self.description = description #public attribute
-        self.price = price #private attribute
-        self.latitude = latitude #private attribute
-        self.longitude = longitude #private attribute
-        self.owner_id = owner_id #private attribute
-        self.reviews = []  # List to store related reviews
-        self.amenities = amenities if amenities else []
-    """
-
 
     def add_review(self, review_id):
         """Add a review to the place."""
@@ -58,8 +43,6 @@ class Place(BaseModel):
                 'latitude': self.latitude, 
                 'longitude': self.longitude,
                 'owner_id': self.owner_id
-                # 'reviews' : self.reviews,
-                # 'amenities': self.amenities
             }
 
 

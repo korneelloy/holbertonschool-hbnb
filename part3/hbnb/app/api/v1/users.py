@@ -24,17 +24,16 @@ class UserList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new user"""
+
+        # Get input data
         user_data = api.payload
 
         # Checking existence of the user's email
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
+
         # Creating the user if not already exist
-        if user_data["email"] != "admin@admin.com":
-            user_data["is_admin"] = False
-        else:
-            user_data["is_admin"] = True
         try:
             new_user = facade.create_user(user_data)
         except:
@@ -83,11 +82,15 @@ class UserResource(Resource):
     def put(self, user_id):
         """change existing user"""
         from app import bcrypt
+
+        # Get input data
         user_data = api.payload
         current_user = get_jwt_identity()
+
         # Checking if the user is the one that be logged in
         if user_id != current_user:
             return {'error': 'Unauthorized action'}, 403
+
         # Checking if the user exist
         existing_user = facade.get_user(user_id)
         if not existing_user:
@@ -99,6 +102,7 @@ class UserResource(Resource):
         # Ensuring that the user don't modify his email
         if not is_admin and existing_user.email != user_data["email"]:
             return {'error': 'You cannot modify email or password'}, 400
+
         # Ensuring that the user don't modify his password
         if not is_admin and not (bcrypt.check_password_hash(existing_user.password, user_data["password"])):
             return {'error': 'You cannot modify email or password'}, 400

@@ -1,8 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from app.models.place import Place
-from app.models.user import User
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt
 
 
 api = Namespace('admin', description='Admin operations')
@@ -60,13 +58,15 @@ class AdminUserCreate(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
         
+        # Get input data
         user_data = api.payload
 
         # Checking existence of the user's email
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             return {'error': 'Email already registered'}, 400
-        # Creating the user if not already exist
+        
+        # Creating the user
         try:
             new_user = facade.create_user(user_data)
         except:
@@ -77,36 +77,10 @@ class AdminUserCreate(Resource):
             'last_name': new_user.last_name,
             'email': new_user.email
             }, 201
-    
-    """
-    @api.response(200, 'Users details retrieved successfully')
-    @api.response(404, 'Users not found')
-    def get(self):
-        Get users
-        users = facade.get_all_users()
-        if not users:   
-            return {'error': 'Users not found'}, 404
-        return users, 200
-    """
+
 
 @api.route('/users/<user_id>')
 class AdminUserModify(Resource):
-    """
-    @api.response(200, 'User details retrieved successfully')
-    @api.response(404, 'User not found')
-    def get(self, user_id):
-        Get user details by ID
-        user = facade.get_user(user_id)
-        if not user:
-            return {'error': 'User not found'}, 404
-        return {
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email
-            }, 200
-    """
-
     @api.expect(user_model, validate=True)
     @api.response(200, 'User details retrieved successfully')
     @api.response(400, 'Invalid Input Data')
@@ -122,6 +96,7 @@ class AdminUserModify(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
+        # Get input data
         user_data = api.payload
   
         # Checking if the user exist
@@ -146,6 +121,7 @@ class AdminUserModify(Resource):
             'email': updated_user.email
             }, 200
 
+
 @api.route('/amenities/')
 class AdminAmenityCreate(Resource):
     @api.expect(amenity_model)
@@ -162,7 +138,10 @@ class AdminAmenityCreate(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
+        # Get input data
         amenity_data = api.payload
+
+        # Creating new amenity
         try:
             new_amenity = facade.create_amenity(amenity_data)
         except:
@@ -173,35 +152,9 @@ class AdminAmenityCreate(Resource):
             'description': new_amenity.description
             }, 201
 
-    """ 
-    @api.response(200, 'List of amenities retrieved successfully')
-    @api.response(404, 'Amenities not found')
-    def get(self):
-        Retrieve a list of all amenities
-        amenities = facade.get_all_amenities()
-        if not amenities:
-            return {'error': 'Amenities not found'}, 404
-        return amenities, 200
-    """
 
 @api.route('/amenities/<amenity_id>')
 class AdminAmenityModify(Resource):
-    """
-    @api.response(200, 'Amenity details retrieved successfully')
-    @api.response(404, 'Amenity not found')
-    def get(self, amenity_id):
-        Get amenity details by ID
-        amenity = facade.get_amenity(amenity_id)
-        if not amenity:
-            return {'error': 'Amenity not found'}, 404
-        return {
-            'id': amenity.id,
-            'name': amenity.name,
-            'description': amenity.description,
-            'places': amenity.places
-            }, 200
-    """
-
     @api.expect(amenity_model, validate=True)
     @api.response(200, 'Amenity updated successfully')
     @api.response(404, 'Amenity not found')
@@ -217,11 +170,14 @@ class AdminAmenityModify(Resource):
         if not is_admin :
             return {'error': 'Admin privileges required'}, 403
 
+        # Get input data
         amenity_data = api.payload
+
         # Ensuring that the amenity exist
         existing_amenity = facade.get_amenity(amenity_id)
         if not existing_amenity:
             return {'error': 'Amenity not found'}, 404
+
         # Updating the amenity informations
         try:
             updated_amenity = facade.update_amenity(amenity_id, amenity_data)
@@ -244,6 +200,7 @@ class AdminPlaceModify(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
+
         # Ensuring that the user is admin
         claims = get_jwt()
         is_admin = claims.get("is_admin", False)
@@ -257,7 +214,7 @@ class AdminPlaceModify(Resource):
         if not existing_place:
             return {'error': 'Place not found'}, 404
 
-        # Ensuring that the place amenity exist
+        # Ensuring that the amenity or amenities exist
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
@@ -286,6 +243,7 @@ class AdminPlaceModify(Resource):
     @jwt_required()
     def delete(self, place_id):
         """Delete a place"""
+
         # Ensuring that the user is admin
         claims = get_jwt()
         is_admin = claims.get("is_admin", False)
@@ -307,6 +265,7 @@ class AdminPlaceModify(Resource):
         facade.delete_place(place_id)
         return {"message": "Place deleted successfully"}, 200
 
+
 @api.route('/reviews/<review_id>')
 class AdminReviewModify(Resource):
     @api.expect(review_model, validate=True)
@@ -317,6 +276,8 @@ class AdminReviewModify(Resource):
     @jwt_required()
     def put(self, review_id):
         """Update a review's information"""
+
+        # Get input data
         review_data = api.payload
 
         # Ensuring that the user is admin
@@ -367,14 +328,10 @@ class AdminReviewModify(Resource):
         
         # Ensuring that the targeted review exist
         try:
-            review = facade.get_review(review_id)
+            facade.get_review(review_id)
         except:
             return {"error": "Not found"}, 404
 
-        # Deleting the review in Place, User and Review
-        place = facade.get_place(review.place_id)
-        user = facade.get_user(review.user_id)
-        #Place.delete_review(place, review_id)
-        #User.delete_review(user, review_id)
+        # Deleting the rerview
         facade.delete_review(review_id)
         return {"message": "Review deleted successfully"}, 200

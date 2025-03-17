@@ -6,17 +6,7 @@ from app import db
 from sqlalchemy import text
 
 
-
 api = Namespace('places', description='Place operations')
-
-"""Define the models for related entities"""
-"""
-amenity_model = api.model('PlaceAmenity', {
-    'id': fields.String(description='Amenity ID'),
-    'name': fields.String(description='Name of the amenity'),
-    'description': fields.String(description='Description of the amenity')
-})
-"""
 
 user_model = api.model('PlaceUser', {
     'id': fields.String(description='User ID'),
@@ -44,18 +34,22 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """Register a new place"""
+        
+        # Get input data
         place_data = api.payload
+
         # Getting the ID of the logged in user
         current_user = get_jwt_identity()
         if current_user:
             place_data['owner_id'] = current_user
         else:
             return {"error": "Invalid Input Data"}
+        
         # Ensuring that the user exist
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
-        # Ensuring that place got amenity
         
+        # Ensuring that amenity or amenities exist
         for amenity in place_data['amenities']:
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400
@@ -84,8 +78,6 @@ class PlaceList(Resource):
             'latitude': new_place.latitude,
             'longitude': new_place.longitude,
             'owner_id': new_place.owner_id
-            # 'reviews': new_place.reviews, 
-            #'amenities': new_place.amenities
             }, 201
 
 
@@ -109,13 +101,13 @@ class PlaceResource(Resource):
         if not place:
             return {'error': 'Place not found'}, 404
                 
-        """getting the amenities with direct sql"""
+        # Getting the amenities with direct sql
         query = text("SELECT amenity_id FROM amenity_place WHERE place_id = :place_id")
         result = db.session.execute(query, {"place_id": place_id})
         data = result.fetchall()
         amenities = [row[0] for row in data]
 
-        """getting the reviews with direct sql"""
+        # Getting the reviews with direct sql
         query = text("SELECT id FROM reviews WHERE _place_id = :place_id")
         result = db.session.execute(query, {"place_id": place_id})
         data = result.fetchall()
@@ -142,19 +134,20 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
+
+        # Get input data
         place_data = api.payload
 
+        # Insuring current user is owner of the place
         current_user = get_jwt_identity()
-       
         if current_user:
             place_data['owner_id'] = current_user
         else:
-            return {"error": "Invalid Input Data"}
+            return {"error": "Invalid Input Data"}, 400
          
         # Ensuring that the user exist
         if facade.get_user(place_data['owner_id']) is None:
             return {"error": "Invalid Input Data"}, 400
-
 
         # Ensuring that the place exist
         existing_place = facade.get_place(place_id)
@@ -170,15 +163,11 @@ class PlaceResource(Resource):
             if facade.get_amenity(amenity) is None:
                 return {"error": "Invalid Input Data"}, 400     
         
-
         # putting the amenities "aside":
         amenities = place_data['amenities']
         place_data['amenities'] = []
 
-        
-        
-        # Updating informations of the place
-
+        # Updating informations of the place with direct sql:
         query = text("""
             UPDATE places 
             SET _title = :title, 
@@ -188,8 +177,6 @@ class PlaceResource(Resource):
             _longitude = :longitude
             WHERE id = :place_id
         """)
-        print(place_data)
-
         db.session.execute(query, {
             "title": place_data["title"], 
             "description": place_data["description"], 
@@ -198,22 +185,13 @@ class PlaceResource(Resource):
             "longitude": place_data["longitude"], 
             "place_id": place_id
         })
-
         db.session.commit()
 
-        
-        """
-        try:
-            updated_place = facade.update_place(place_id, place_data)
-        except:
-            return {"error": "Invalid Input Datacccc"}, 400
-        """
         #deleting existing amenities with direct sql: 
         query = text("DELETE FROM amenity_place WHERE place_id = :place_id")
         values = {"place_id": place_id}
         db.session.execute(query, values)
         db.session.commit()
-
 
         #adding amenities to amenity-place with direct sql: 
         if amenities != []:
@@ -222,6 +200,7 @@ class PlaceResource(Resource):
             db.session.execute(query, values)
             db.session.commit()
 
+        #getting updated info of the place:
         updated_place = facade.get_place(place_id)
 
         return {
@@ -232,6 +211,5 @@ class PlaceResource(Resource):
             'latitude': updated_place.latitude,
             'longitude': updated_place.longitude,
             'owner_id': updated_place.owner_id,
-            # 'reviews': updated_place.reviews, 
             'amenities': amenities
             }, 200

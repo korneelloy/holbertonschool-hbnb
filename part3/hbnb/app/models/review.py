@@ -11,15 +11,6 @@ class Review(BaseModel):
     _place_id = db.Column(db.String(128),ForeignKey('places.id'), nullable=False)
     _user_id = db.Column(db.String(128), ForeignKey('users.id'),nullable=False)
 
-    """
-    def __init__(self, comment, rating, place_id, user_id):
-        super().__init__()
-        self.rating = rating #protected attribute
-        self.comment = comment #protected attribute
-        self.place_id = place_id #private attribute
-        self.user_id = user_id #private attribute
-    """
-
 
     def to_dict(self):
         """Convert a data object to dictionary"""

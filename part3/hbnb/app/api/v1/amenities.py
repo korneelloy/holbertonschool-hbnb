@@ -17,7 +17,11 @@ class AmenityList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new amenity"""
+
+        # Get input data
         amenity_data = api.payload
+
+        # Create amenity
         try:
             new_amenity = facade.create_amenity(amenity_data)
         except:
@@ -63,10 +67,12 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         """Update an amenity's information"""
         amenity_data = api.payload
+
         # Ensuring that the amenity exist
         existing_amenity = facade.get_amenity(amenity_id)
         if not existing_amenity:
             return {'error': 'Amenity not found'}, 404
+        
         # Updating the amenity informations
         try:
             updated_amenity = facade.update_amenity(amenity_id, amenity_data)
