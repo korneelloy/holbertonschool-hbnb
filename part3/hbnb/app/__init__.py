@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restx import Api
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_cors import CORS
 
 
 from config import DevelopmentConfig
@@ -31,7 +31,9 @@ def create_app(config_class='config.DevelopmentConfig'):
     from app.api.v1.auth import api as auth_ns
     from app.api.v1.admins import api as admin_ns
     app = Flask(__name__)
-    
+    CORS(app, origins=["http://localhost:8000"], supports_credentials=True)
+
+
     app.config.from_object(config_class)
     api = Api(
         app,
