@@ -4,6 +4,8 @@ from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from sqlalchemy import text
+from flask import make_response
+
 
 
 api = Namespace('places', description='Place operations')
@@ -25,7 +27,7 @@ place_model = api.model('Place', {
 })
 
 
-@api.route('/')
+@api.route('/', methods=['GET', 'POST'])
 class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
@@ -89,8 +91,7 @@ class PlaceList(Resource):
         places = facade.get_all_places()
         if not places:
             return {'error': 'Places not found'}, 404
-        return places, 200
-
+        return {'places': places}, 200
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):

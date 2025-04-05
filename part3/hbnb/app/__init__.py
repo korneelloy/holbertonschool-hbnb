@@ -30,8 +30,10 @@ def create_app(config_class='config.DevelopmentConfig'):
     from app.api.v1.places import api as places_ns
     from app.api.v1.auth import api as auth_ns
     from app.api.v1.admins import api as admin_ns
+
     app = Flask(__name__)
     CORS(app, origins=["http://localhost:8000"], supports_credentials=True)
+
 
 
     app.config.from_object(config_class)
