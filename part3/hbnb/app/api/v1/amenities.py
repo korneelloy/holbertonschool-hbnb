@@ -43,7 +43,7 @@ class AmenityList(Resource):
         return amenities, 200
 
 
-@api.route('/<amenity_id>')
+@api.route('/<amenity_id>', methods=['GET', 'PUT'])
 class AmenityResource(Resource):
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')
@@ -56,7 +56,6 @@ class AmenityResource(Resource):
             'id': amenity.id,
             'name': amenity.name,
             'description': amenity.description,
-            'places': amenity.places
             }, 200
 
 

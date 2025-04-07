@@ -6,7 +6,7 @@
 * {
     box-sizing: border-box;
     margin: 0;
-    padding: 0;
+    padding: 5px;
     font-family: Arial, sans-serif;
 }
 
@@ -31,9 +31,63 @@ main {
     padding: 2rem;
 }
 
-.place-card .review-card {
+.place-card, .review-card {
     margin: 20px;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
+}
+
+.place-card *:not(:first-child), 
+.review-card *:not(:first-child ){
+    margin-left: 20px;
+    padding: 10px;
+}
+
+ol {
+    padding-left: 40px;
+}
+
+.review-card {
+    font-weight: bold;
+}
+
+
+.review-card p {
+    font-weight: normal;
+}
+
+.message {
+    padding-left: 40px;
+    font-weight: normal;
+    font-size: medium;
+}
+
+.btn-link {
+    display: inline-block;
+    padding: 5px 5px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+.btn-link:hover {
+    background-color: #2980b9;
+}
+
+section {
+    padding: 10px;
+}
+
+footer {
+    text-align: center;
+    font-style: italic;
+    bottom: 0;
+    width: 100%;
+    font-size: small;
 }
