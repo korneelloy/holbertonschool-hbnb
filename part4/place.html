@@ -5,35 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Place Details</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="images/icon.png" type="image/png">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
 <body>
     <header>
-        <img src="images/logo.png" class="logo" alt="Logo">
         <nav>
+            <a href="index.html">
+                <img src="images/logo.png" class="logo" alt="Logo">
+            </a>
             <a href="index.html" id="index-link">List of places</a>
-            <a href="login.html" id="login-link" class="login-button">Login</a>
-            <a href="add_review.html" id="add-review-link">Add review</a>
-            <a href="place.html" id="place-link">Place details</a>
+            <a href="login.html" id="login-link">Login</a>
+            <span id="logged-in"></span>
         </nav>
     </header>
     <main>
         <section id="place-details">
             <!-- Place details populated dynamically -->
             <h2>Place details:</h2>
-            <div class="place-details place-info">
-              
-            </div>
+            <div class="place-details place-info"></div>
         </section>
         <section id="reviews">
             <!-- Reviews will be populated dynamically -->
             <h2>Reviews:</h2>
-
-            
-
         </section>
         <section id="add-review" class="add-review form">
-            <a href="./add_review.html" class="btn-link" role="button">
+            <a class="btn-link" role="button" id="add-review-linker">
                 <h2>Add a Review</h2>
             </a>
         </section>

@@ -123,3 +123,23 @@ class UserResource(Resource):
             'last_name': updated_user.last_name,
             'email': updated_user.email
             }, 200
+
+
+@api.route('/mail/<user_mail>')
+class UserResource(Resource): 
+    @api.response(200, 'User details retrieved successfully')
+    @api.response(404, 'User not found')
+    @api.doc(security="Bearer Auth")
+    def get(self, user_mail):
+        """Get user details by email"""
+        user = facade.get_user_by_email(user_mail)
+        if not user:
+            return {'error': 'User not found'}, 404
+        return {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'password': user.password
+            }, 200
+

@@ -27,6 +27,19 @@ nav a {
     margin-left: 1rem;
 }
 
+nav {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    position: relative;
+}
+
+#logged-in {
+    position: absolute;
+    right: 50px;
+    color: white;
+}
+
 main {
     padding: 2rem;
 }
@@ -61,6 +74,7 @@ ol {
     padding-left: 40px;
     font-weight: normal;
     font-size: medium;
+    font-style: italic;
 }
 
 .btn-link {
@@ -91,3 +105,20 @@ footer {
     width: 100%;
     font-size: small;
 }
+
+#review-form * {
+    display: block;
+}
+
+#review-form .btn-link{
+    margin-top: 30px;
+
+}
+
+
+
+#review-form #review,
+#review-form #rating {
+    margin-left: 30px;
+}
+

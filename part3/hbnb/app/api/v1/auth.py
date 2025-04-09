@@ -24,7 +24,7 @@ class Login(Resource):
         if not user or not user.verify_password(credentials['password']):
             return ({'error': 'Invalid credentials'}, 401)
         
-        access_token = create_access_token(identity=str(user.id), additional_claims={'is_admin': user.is_admin})
+        access_token = create_access_token(identity=str(user.id), additional_claims={'is_admin': user.is_admin, 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email})
         response = make_response(jsonify({'access_token': access_token}), 200)
         return response
 
